@@ -1,19 +1,16 @@
-
 ; uncomment following two lines if using 16f627 or 16f628. config uses internal oscillator
 	LIST	p=16F628		;tell assembler what chip we are using
 	include "P16F628.inc"		;include the defaults for the chip
 	__config 0x3D18			;sets the configuration settings (oscillator type etc.)
-
-; Filename : Sample.asm
 
 ; DECLARE VARIABLES!!!!!!
 ; We are telling the assembler we want to start allocating symbolic variables starting
 ;    at machine location 0x20. Please refer to technical documents to see if this is OK!!
 
 cblock 	0x20 			;start of general purpose registers
-		count1 			;  count1 is symbolic name for location 0x20
-		counta 			;  counta is symbolic name for location 0x21
-		countb 			;  countb is symbolic name for location 0x22
+		outLoop			;outLoop is symbolic name for location 0x20
+		inLoop 			;inLoop is symbolic name for location 0x21
+		countb 			;countb is symbolic name for location 0x22
 	endc
 
 ;un-comment the following two lines if using 16f627 or 16f628
@@ -26,26 +23,56 @@ cblock 	0x20 			;start of general purpose registers
 
 	bsf		STATUS,RP0
 	movlw	0x00
-	movwf	TRISB			; portb is output
+	movwf	TRISB			;portb is output
 	movlw	0xff
 	movwf	TRISA			;porta is input
 	bcf		STATUS,RP0		;return to bank 0
 
 ;start  main code here
 	
-	led_off		movlw	0xff		
-				movwf	PORTB		;turn that light on
-	led_on		movlw	0x00
-				movwf	PORTB		;turn light off
-				goto	led_off	
+	start		movlw	0x00		
+				movwf	PORTB		;light is off at the execution of this line
+				call	delay275	;more accurately, delay274_996
+			
+				movlw	0xFF
+				movwf	PORTB		;light is on at the execution of this line
+				call	delay180	;also more accurately delay179_994
+				goto	start	
 	
 	
-; don't forget the word 'end'	
+; don't forget the word 'end'
 	end
 
 ;Subroutine: delay275
-;Used to delay the program for 275 milliseconds
-;
-delay275
+;Used to delay the program for 274_996 microseconds (approximately 275 milliseconds)
+;Precondition: there are locations declared for inLoop and outLoop
+;Postcondition: 274_996 microseconds have passed, and inLoop and outLoop both have 0x00
+delay275	movlw	0xCC		;decimal 204
+			movwl	outLoop
+			
+outer		movlw	0x16		;decimal 22
+			movwl	inLoop
+			
+	inner1	decfsz	inLoop, f
+			goto	inner1
+			nop
+			
+			movlw	0x3D		;decimal 61
+			movwl	inLoop
+	inner2	decfsz	inLoop, f
+			goto	inner2
+			nop
+			
+			decfsz	outLoop, f
+			goto	outer
+			nop					;helps keep the math beautiful (offsets the +1 microsecond from decfsz)
+			
+			return
 
+;Subroutine: delay180
+;Used to delay the program for 149_994 milliseconds (approximately 180 milliseconds)
+;Precondition:
+;Postcondition:
 delay180
+
+			return
