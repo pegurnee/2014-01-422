@@ -1,5 +1,5 @@
 ;sayEddie.txt
-;Using a 7-segment LED, have it display "EDDIE"
+;Using a 7-segment LED, have it display "EddIE"
 ;@author: Eddie Gurnee
 ;@version: 1/02/2014
 ; uncomment following two lines if using 16f627 or 16f628.
