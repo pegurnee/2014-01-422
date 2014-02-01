@@ -1,3 +1,7 @@
+;Project1.txt
+;Makes an LED flash on for 275 milliseconds, then turns off for 180 milliseconds.
+;@author: Eddie Gurnee
+;@version: 1/02/2014
 ; uncomment following two lines if using 16f627 or 16f628. config uses internal oscillator
 	LIST	p=16F628		;tell assembler what chip we are using
 	include "P16F628.inc"		;include the defaults for the chip
@@ -8,14 +12,12 @@
 ;    at machine location 0x20. Please refer to technical documents to see if this is OK!!
 
 cblock 	0x20 			;start of general purpose registers
-		outLoop			;outLoop is symbolic name for location 0x20
-		inLoop 			;inLoop is symbolic name for location 0x21
-		countb 			;countb is symbolic name for location 0x22
+		outLoop			;outLoop is symbolic name for location 0x20 - used in both subroutines for the outerloop
+		inLoop 			;inLoop is symbolic name for location 0x21 - used in both subroutines for inner loops
 	endc
 
 ;un-comment the following two lines if using 16f627 or 16f628
 ; FORGET THESE 2 LINES AND FUNNY STUFF HAPPENS
-
 	movlw	0x07
 	movwf	CMCON			;turn comparators off (make it like a 16F84)
 	
@@ -28,7 +30,7 @@ cblock 	0x20 			;start of general purpose registers
 	movwf	TRISA			;porta is input
 	bcf		STATUS,RP0		;return to bank 0
 
-;start  main code here
+;start main code here
 	
 	start		movlw	0x00		
 				movwf	PORTB		;light is off at the execution of this line
@@ -65,7 +67,7 @@ d275_outer		movlw	0x16		;decimal 22
 			
 				decfsz	outLoop, f
 				goto	d275_outer
-				nop					;helps keep the math beautiful (offsets the +1 microsecond from decfsz)
+				nop					;helps keep the math beautiful (offsets the -1 microsecond from skipping goto)
 			
 			return
 
@@ -91,6 +93,6 @@ d180_outer		movlw	0x17		;decimal 23
 				
 				decfsz	outLoop, f
 				goto	d180_outer
-				nop					;helps keep the math beautiful (offsets the +1 microsecond from decfsz)
+				nop					;helps keep the math beautiful (offsets the -1 microsecond from skipping goto)
 			
 			return
