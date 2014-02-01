@@ -1,0 +1,408 @@
+MPASM  5.51                      SAYEDDIE.ASM   2-1-2014  6:26:51         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ;sayEddie.txt
+                      00002 ;Using a 7-segment LED, have it display "EDDIE"
+                      00003 ;@author: Eddie Gurnee
+                      00004 ;@version: 1/02/2014
+                      00005 ; uncomment following two lines if using 16f627 or 16f628.
+                      00006         LIST    p=16F628                ;tell assembler what chip we are using
+                      00007         include "P16F628.inc"   ;include the defaults for the chip
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ;  MPASM PIC16F628 processor include
+                      00005 ; 
+                      00006 ;  (c) Copyright 1999-2013 Microchip Technology, All rights reserved
+                      00007 ;==========================================================================
+                      00008 
+                      00381         LIST
+2007   3D18           00008         __config 0x3D18                 ;sets the configuration settings (oscillator type etc.)
+                      00009 
+                      00010 ; We are telling the assembler we want to start allocating symbolic variables starting
+                      00011 ;    at machine location 0x20.
+                      00012 
+Warning[205]: Found directive in column 1. (cblock)
+                      00013 cblock  0x20                    ;start of general purpose registers
+  00000020            00014                 count1                  ;used in delay routine
+  00000021            00015                 counta                  ;used in delay routine 
+  00000022            00016                 countb                  ;used in delay routine
+                      00017         endc
+                      00018         
+  0000004F            00019 e equ 0x4F      ;in reverse order: 0x79
+  0000003D            00020 d equ 0x3D      ;in reverse order: 0x5E
+  00000030            00021 i equ 0x30      ;in reverse order: 0x06
+                      00022 
+                      00023 ;the following lines turn off the comparators
+0000   3007           00024         movlw   0x07
+0001   009F           00025         movwf   CMCON           ;turn comparators off (make it like a 16F84)
+                      00026         
+                      00027 ;We must change memory banks to set the TRIS registers
+                      00028 
+0002   1683           00029         bsf             STATUS,RP0
+0003   3000           00030         movlw   0x00
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0004   0086           00031         movwf   TRISB                   ;PORTB is output
+0005   30FF           00032         movlw   0xff
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0006   0085           00033         movwf   TRISA                   ;PORTA is input
+0007   1283           00034         bcf             STATUS,RP0              ;return to bank 0
+                      00035 
+                      00036 ;actual code follows here
+                      00037         
+0008   084F           00038 start   movf    e, w
+0009   2014           00039                 call    display
+000A   083D           00040                 movf    d, w
+000B   2014           00041                 call    display
+MPASM  5.51                      SAYEDDIE.ASM   2-1-2014  6:26:51         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+000C   083D           00042                 movf    d, w
+000D   2014           00043                 call    display
+000E   0830           00044                 movf    i, w
+000F   2014           00045                 call    display
+0010   084F           00046                 movf    e, w
+0011   2014           00047                 call    display
+0012   2022           00048                 call    del_50
+0013   2808           00049                 goto    start
+                      00050         
+                      00051 ;Subroutine: display
+                      00052 ;Displays a digit on a seven-segment display
+                      00053 ;Precondition: the hexcode for a 7-segment display digit is in the 'w' register
+                      00054 ;Postcondition: the digit is displayed on the 7-segment display, and ~250 milliseconds pass
+0014   0086           00055 display movwf   PORTB
+0015   2026           00056                 call    del_250
+0016   0186           00057                 clrf    PORTB
+0017   201E           00058                 call    del_10
+0018   0008           00059                 return
+                      00060                 
+                      00061 ;Subroutine: delay
+                      00062 ;Delays for a span of time - taken directly from http://www.emunix.emich.edu/~sverdlik/COSC422/PICDelay.
+                            html
+                      00063 ;Made a few adjustments for style
+                      00064 ;Precondition: nothing specific
+                      00065 ;Postcondition: the program delays for a variety of times
+0019   3400           00066 del_0   retlw   0x00                    ;delay 0mS - return immediately
+001A   3001           00067 del_1   movlw   0x01                    ;delay 1mS
+001B   2827           00068                 goto    delay
+001C   3005           00069 del_5   movlw   0x05                    ;delay 5mS
+001D   2827           00070                 goto    delay
+001E   300A           00071 del_10  movlw   0x0A                    ;delay 10mS
+001F   2827           00072                 goto    delay
+0020   3014           00073 del_20  movlw   0x14                    ;delay 20mS
+0021   2827           00074                 goto    delay
+0022   3032           00075 del_50  movlw   0x32                    ;delay 50mS
+0023   2827           00076                 goto    delay
+0024   3064           00077 del_100 movlw   0x64                    ;delay 100mS
+0025   2827           00078                 goto    delay
+0026   30FA           00079 del_250 movlw   0xFA                    ;delay 250 ms
+                      00080 
+0027   00A0           00081 delay   movwf   count1
+0028   30C7           00082 d_in    movlw   0xC7                    ;delay 1mS
+0029   00A1           00083                 movwf   counta
+002A   3001           00084                 movlw   0x01
+002B   00A2           00085                 movwf   countb
+002C   0BA1           00086 d_loop  decfsz  counta, f
+002D   282F           00087                 goto    $+2
+002E   0BA2           00088                 decfsz  countb, f
+002F   282C           00089                 goto    d_loop
+0030   0BA0           00090                 decfsz  count1  ,f
+0031   2828           00091                 goto    d_in
+0032   3400           00092                 retlw   0x00
+                      00093                 
+MPASM  5.51                      SAYEDDIE.ASM   2-1-2014  6:26:51         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00094 ; don't forget the word 'end' (it ends the code)
+                      00095         end
+MPASM  5.51                      SAYEDDIE.ASM   2-1-2014  6:26:51         PAGE  4
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ADDEN                             00000003
+ADEN                              00000003
+BRGH                              00000002
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CIS                               00000003
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000001F
+CMIE                              00000006
+CMIF                              00000006
+CREN                              00000004
+CSRC                              00000007
+DATA_CP_OFF                       00003FFF
+DATA_CP_ON                        00003EFF
+DC                                00000001
+EEADR                             0000009B
+EECON1                            0000009C
+EECON2                            0000009D
+EEDATA                            0000009A
+EEIE                              00000007
+EEIF                              00000007
+F                                 00000001
+FERR                              00000002
+FSR                               00000004
+GIE                               00000007
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+NOT_BO                            00000000
+NOT_BOD                           00000000
+NOT_BOR                           00000000
+NOT_PD                            00000003
+NOT_POR                           00000001
+MPASM  5.51                      SAYEDDIE.ASM   2-1-2014  6:26:51         PAGE  5
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+NOT_RBPU                          00000007
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+OERR                              00000001
+OPTION_REG                        00000081
+OSCF                              00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PIE1                              0000008C
+PIR1                              0000000C
+PORTA                             00000005
+PORTB                             00000006
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RA6                               00000006
+RA7                               00000007
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RP0                               00000005
+RP1                               00000006
+RX9                               00000006
+RX9D                              00000000
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+STATUS                            00000003
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+MPASM  5.51                      SAYEDDIE.ASM   2-1-2014  6:26:51         PAGE  6
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1OSCEN                           00000003
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISA6                            00000006
+TRISA7                            00000007
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRMT                              00000001
+TX9                               00000006
+TX9D                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+MPASM  5.51                      SAYEDDIE.ASM   2-1-2014  6:26:51         PAGE  7
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+VR0                               00000000
+VR1                               00000001
+VR2                               00000002
+VR3                               00000003
+VRCON                             0000009F
+VREN                              00000007
+VROE                              00000006
+VRR                               00000005
+W                                 00000000
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_50                            00002BFF
+_CP_75                            000017FF
+_CP_ALL                           000003FF
+_CP_OFF                           00003FFF
+_DEVID1                           00002006
+_ER_OSC_CLKOUT                    00003FFF
+_ER_OSC_NOCLKOUT                  00003FFE
+_EXTCLK_OSC                       00003FEF
+_FOSC_ECIO                        00003FEF
+_FOSC_ERCLK                       00003FFF
+_FOSC_ERIO                        00003FFE
+_FOSC_HS                          00003FEE
+_FOSC_INTOSCCLK                   00003FFD
+_FOSC_INTOSCIO                    00003FFC
+_FOSC_LP                          00003FEC
+_FOSC_XT                          00003FED
+_HS_OSC                           00003FEE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_INTRC_OSC_CLKOUT                 00003FFD
+_INTRC_OSC_NOCLKOUT               00003FFC
+_LP_OSC                           00003FEC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_MCLRE_OFF                        00003FDF
+_MCLRE_ON                         00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+MPASM  5.51                      SAYEDDIE.ASM   2-1-2014  6:26:51         PAGE  8
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FED
+__16F628                          00000001
+count1                            00000020
+counta                            00000021
+countb                            00000022
+d                                 0000003D
+d_in                              00000028
+d_loop                            0000002C
+del_0                             00000019
+del_1                             0000001A
+del_10                            0000001E
+del_100                           00000024
+del_20                            00000020
+del_250                           00000026
+del_5                             0000001C
+del_50                            00000022
+delay                             00000027
+display                           00000014
+e                                 0000004F
+i                                 00000030
+start                             00000008
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXX-------------
+2000 : -------X-------- ---------------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:    51
+Program Memory Words Free:  1997
+
+
+Errors   :     0
+Warnings :     1 reported,     0 suppressed
+Messages :     2 reported,     0 suppressed
+
+
