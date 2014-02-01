@@ -1,0 +1,410 @@
+MPASM  5.51                      PROJECT1.ASM   2-1-2014  3:11:47         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ;Project1.txt
+                      00002 ;Makes an LED flash on for 275 milliseconds, then turns off for 180 milliseconds.
+                      00003 ;@author: Eddie Gurnee
+                      00004 ;@version: 1/02/2014
+                      00005 ; uncomment following two lines if using 16f627 or 16f628. config uses internal oscillator
+                      00006         LIST    p=16F628                ;tell assembler what chip we are using
+                      00007         include "P16F628.inc"           ;include the defaults for the chip
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ;  MPASM PIC16F628 processor include
+                      00005 ; 
+                      00006 ;  (c) Copyright 1999-2013 Microchip Technology, All rights reserved
+                      00007 ;==========================================================================
+                      00008 
+                      00381         LIST
+2007   3D18           00008         __config 0x3D18                 ;sets the configuration settings (oscillator type etc.)
+                      00009 
+                      00010 ; DECLARE VARIABLES!!!!!!
+                      00011 ; We are telling the assembler we want to start allocating symbolic variables starting
+                      00012 ;    at machine location 0x20. Please refer to technical documents to see if this is OK!!
+                      00013 
+Warning[205]: Found directive in column 1. (cblock)
+                      00014 cblock  0x20                    ;start of general purpose registers
+  00000020            00015                 outLoop                 ;outLoop is symbolic name for location 0x20 - used in both subro
+                            utines for the outerloop
+  00000021            00016                 inLoop                  ;inLoop is symbolic name for location 0x21 - used in both subrou
+                            tines for inner loops
+                      00017         endc
+                      00018 
+                      00019 ;un-comment the following two lines if using 16f627 or 16f628
+                      00020 ; FORGET THESE 2 LINES AND FUNNY STUFF HAPPENS
+0000   3007           00021         movlw   0x07
+0001   009F           00022         movwf   CMCON                   ;turn comparators off (make it like a 16F84)
+                      00023         
+                      00024 ; The following is very typical. We must change memory banks to set the TRIS registers
+                      00025 
+0002   1683           00026         bsf             STATUS,RP0
+0003   3000           00027         movlw   0x00
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0004   0086           00028         movwf   TRISB                   ;portb is output
+0005   30FF           00029         movlw   0xff
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0006   0085           00030         movwf   TRISA                   ;porta is input
+0007   1283           00031         bcf             STATUS,RP0              ;return to bank 0
+                      00032 
+                      00033 ;start main code here
+                      00034         
+Warning[207]: Found label after column 1. (start)
+0008   3000           00035         start           movlw   0x00            
+0009   0086           00036                                 movwf   PORTB           ;light is off at the execution of this line
+000A   200F           00037                                 call    delay275        ;more accurately, delay274_996
+                      00038                         
+MPASM  5.51                      PROJECT1.ASM   2-1-2014  3:11:47         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+000B   30FF           00039                                 movlw   0xFF
+000C   0086           00040                                 movwf   PORTB           ;light is on at the execution of this line
+000D   201F           00041                                 call    delay180        ;also more accurately delay179_994
+000E   2808           00042                                 goto    start
+                      00043                                 
+                      00044 ;Subroutine: delay275
+                      00045 ;Used to delay the program for 274_996 microseconds (approximately 275 milliseconds)
+                      00046 ;Precondition: there are locations declared for inLoop and outLoop
+                      00047 ;Postcondition: 274_996 microseconds have passed, and inLoop and outLoop both have 0x00
+000F   30CC           00048 delay275                movlw   0xCC                    ;decimal 204
+0010   00A0           00049                                 movwf   outLoop
+                      00050                         
+0011   3016           00051 d275_outer              movlw   0x16            ;decimal 22
+0012   00A1           00052                                 movwf   inLoop
+                      00053                         
+Warning[207]: Found label after column 1. (d275_inner1)
+0013   0BA1           00054         d275_inner1     decfsz  inLoop, f
+0014   2813           00055                                 goto    d275_inner1
+0015   0000           00056                                 nop
+                      00057                         
+0016   303D           00058                                 movlw   0x3D            ;decimal 61
+0017   00A1           00059                                 movwf   inLoop
+Warning[207]: Found label after column 1. (d275_inner2)
+0018   0BA1           00060         d275_inner2     decfsz  inLoop, f
+0019   2818           00061                                 goto    d275_inner2
+001A   0000           00062                                 nop
+                      00063                         
+001B   0BA0           00064                                 decfsz  outLoop, f
+001C   2811           00065                                 goto    d275_outer
+001D   0000           00066                                 nop                                     ;helps keep the math beautiful (
+                            offsets the -1 microsecond from skipping goto)
+                      00067                         
+001E   0008           00068                         return
+                      00069 
+                      00070 ;Subroutine: delay180
+                      00071 ;Used to delay the program for 149_994 milliseconds (approximately 180 milliseconds)
+                      00072 ;Precondition: there are locations declared for inLoop and outLoop
+                      00073 ;Postcondition: 194_994 microseconds have passed, and inLoop and outLoop both have 0x00
+001F   30CD           00074 delay180                movlw   0xCD            ;decimal 205
+0020   00A0           00075                                 movwf   outLoop
+                      00076                         
+0021   3017           00077 d180_outer              movlw   0x17            ;decimal 23
+0022   00A1           00078                                 movwf   inLoop
+                      00079                         
+Warning[207]: Found label after column 1. (d180_inner1)
+0023   0BA1           00080         d180_inner1     decfsz  inLoop, f
+0024   2823           00081                                 goto    d180_inner1
+0025   0000           00082                                 nop
+                      00083                                 
+0026   3026           00084                                 movlw   0x26            ;decimal 38
+0027   00A1           00085                                 movwf   inLoop
+Warning[207]: Found label after column 1. (d180_inner2)
+0028   0BA1           00086         d180_inner2     decfsz  inLoop, f
+MPASM  5.51                      PROJECT1.ASM   2-1-2014  3:11:47         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0029   2828           00087                                 goto    d180_inner2
+002A   0000           00088                                 nop
+                      00089                                 
+002B   0BA0           00090                                 decfsz  outLoop, f
+002C   2821           00091                                 goto    d180_outer
+002D   0000           00092                                 nop                                     ;helps keep the math beautiful (
+                            offsets the -1 microsecond from skipping goto)
+                      00093                         
+002E   0008           00094                         return
+                      00095         
+                      00096 ; don't forget the word 'end'
+                      00097         end
+MPASM  5.51                      PROJECT1.ASM   2-1-2014  3:11:47         PAGE  4
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ADDEN                             00000003
+ADEN                              00000003
+BRGH                              00000002
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CIS                               00000003
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000001F
+CMIE                              00000006
+CMIF                              00000006
+CREN                              00000004
+CSRC                              00000007
+DATA_CP_OFF                       00003FFF
+DATA_CP_ON                        00003EFF
+DC                                00000001
+EEADR                             0000009B
+EECON1                            0000009C
+EECON2                            0000009D
+EEDATA                            0000009A
+EEIE                              00000007
+EEIF                              00000007
+F                                 00000001
+FERR                              00000002
+FSR                               00000004
+GIE                               00000007
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+NOT_BO                            00000000
+NOT_BOD                           00000000
+NOT_BOR                           00000000
+NOT_PD                            00000003
+NOT_POR                           00000001
+MPASM  5.51                      PROJECT1.ASM   2-1-2014  3:11:47         PAGE  5
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+NOT_RBPU                          00000007
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+OERR                              00000001
+OPTION_REG                        00000081
+OSCF                              00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PIE1                              0000008C
+PIR1                              0000000C
+PORTA                             00000005
+PORTB                             00000006
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RA6                               00000006
+RA7                               00000007
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RP0                               00000005
+RP1                               00000006
+RX9                               00000006
+RX9D                              00000000
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+STATUS                            00000003
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+MPASM  5.51                      PROJECT1.ASM   2-1-2014  3:11:47         PAGE  6
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1OSCEN                           00000003
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISA6                            00000006
+TRISA7                            00000007
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRMT                              00000001
+TX9                               00000006
+TX9D                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+MPASM  5.51                      PROJECT1.ASM   2-1-2014  3:11:47         PAGE  7
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+VR0                               00000000
+VR1                               00000001
+VR2                               00000002
+VR3                               00000003
+VRCON                             0000009F
+VREN                              00000007
+VROE                              00000006
+VRR                               00000005
+W                                 00000000
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_50                            00002BFF
+_CP_75                            000017FF
+_CP_ALL                           000003FF
+_CP_OFF                           00003FFF
+_DEVID1                           00002006
+_ER_OSC_CLKOUT                    00003FFF
+_ER_OSC_NOCLKOUT                  00003FFE
+_EXTCLK_OSC                       00003FEF
+_FOSC_ECIO                        00003FEF
+_FOSC_ERCLK                       00003FFF
+_FOSC_ERIO                        00003FFE
+_FOSC_HS                          00003FEE
+_FOSC_INTOSCCLK                   00003FFD
+_FOSC_INTOSCIO                    00003FFC
+_FOSC_LP                          00003FEC
+_FOSC_XT                          00003FED
+_HS_OSC                           00003FEE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_INTRC_OSC_CLKOUT                 00003FFD
+_INTRC_OSC_NOCLKOUT               00003FFC
+_LP_OSC                           00003FEC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_MCLRE_OFF                        00003FDF
+_MCLRE_ON                         00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+MPASM  5.51                      PROJECT1.ASM   2-1-2014  3:11:47         PAGE  8
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FED
+__16F628                          00000001
+d180_inner1                       00000023
+d180_inner2                       00000028
+d180_outer                        00000021
+d275_inner1                       00000013
+d275_inner2                       00000018
+d275_outer                        00000011
+delay180                          0000001F
+delay275                          0000000F
+inLoop                            00000021
+outLoop                           00000020
+start                             00000008
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXX- ----------------
+2000 : -------X-------- ---------------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:    47
+Program Memory Words Free:  2001
+
+
+Errors   :     0
+Warnings :     6 reported,     0 suppressed
+Messages :     2 reported,     0 suppressed
+
+

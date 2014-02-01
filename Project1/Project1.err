@@ -1,0 +1,8 @@
+Warning[205] F:\GITREPOS\COSC422\PROJECT1\PROJECT1.ASM 14 : Found directive in column 1. (cblock)
+Message[302] F:\GITREPOS\COSC422\PROJECT1\PROJECT1.ASM 28 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] F:\GITREPOS\COSC422\PROJECT1\PROJECT1.ASM 30 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Warning[207] F:\GITREPOS\COSC422\PROJECT1\PROJECT1.ASM 35 : Found label after column 1. (start)
+Warning[207] F:\GITREPOS\COSC422\PROJECT1\PROJECT1.ASM 54 : Found label after column 1. (d275_inner1)
+Warning[207] F:\GITREPOS\COSC422\PROJECT1\PROJECT1.ASM 60 : Found label after column 1. (d275_inner2)
+Warning[207] F:\GITREPOS\COSC422\PROJECT1\PROJECT1.ASM 80 : Found label after column 1. (d180_inner1)
+Warning[207] F:\GITREPOS\COSC422\PROJECT1\PROJECT1.ASM 86 : Found label after column 1. (d180_inner2)
