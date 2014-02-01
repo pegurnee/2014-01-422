@@ -47,32 +47,50 @@ cblock 	0x20 			;start of general purpose registers
 ;Used to delay the program for 274_996 microseconds (approximately 275 milliseconds)
 ;Precondition: there are locations declared for inLoop and outLoop
 ;Postcondition: 274_996 microseconds have passed, and inLoop and outLoop both have 0x00
-delay275	movlw	0xCC		;decimal 204
-			movwl	outLoop
+delay275		movlw	0xCC			;decimal 204
+				movwl	outLoop
 			
-outer		movlw	0x16		;decimal 22
-			movwl	inLoop
+d275_outer		movlw	0x16		;decimal 22
+				movwl	inLoop
 			
-	inner1	decfsz	inLoop, f
-			goto	inner1
-			nop
+	d275_inner1	decfsz	inLoop, f
+				goto	d275_inner1
+				nop
 			
-			movlw	0x3D		;decimal 61
-			movwl	inLoop
-	inner2	decfsz	inLoop, f
-			goto	inner2
-			nop
+				movlw	0x3D		;decimal 61
+				movwl	inLoop
+	d275_inner2	decfsz	inLoop, f
+				goto	d275_inner2
+				nop
 			
-			decfsz	outLoop, f
-			goto	outer
-			nop					;helps keep the math beautiful (offsets the +1 microsecond from decfsz)
+				decfsz	outLoop, f
+				goto	d275_outer
+				nop					;helps keep the math beautiful (offsets the +1 microsecond from decfsz)
 			
 			return
 
 ;Subroutine: delay180
 ;Used to delay the program for 149_994 milliseconds (approximately 180 milliseconds)
-;Precondition:
-;Postcondition:
-delay180
-
+;Precondition: there are locations declared for inLoop and outLoop
+;Postcondition: 194_994 microseconds have passed, and inLoop and outLoop both have 0x00
+delay180		movlw	0xCD		;decimal 205
+				movwl	outLoop
+			
+d180_outer		movlw	0x17		;decimal 23
+				movwl	inLoop
+			
+	d180_inner1	decfsz	inLoop, f
+				goto	d180_inner1
+				nop
+				
+				movlw	0x26		;decimal 38
+				movwl	inLoop
+	d180_inner2	decfsz	inLoop, f
+				goto	d180_inner2
+				nop
+				
+				decfsz	outLoop, f
+				goto	d180_outer
+				nop					;helps keep the math beautiful (offsets the +1 microsecond from decfsz)
+			
 			return
