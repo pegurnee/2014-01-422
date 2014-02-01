@@ -1,3 +1,0 @@
-Warning[205] F:\GITREPOS\COSC422\FUN\SAYEDDIE.ASM 13 : Found directive in column 1. (cblock)
-Message[302] F:\GITREPOS\COSC422\FUN\SAYEDDIE.ASM 32 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Message[302] F:\GITREPOS\COSC422\FUN\SAYEDDIE.ASM 34 : Register in operand not in bank 0.  Ensure that bank bits are correct.
