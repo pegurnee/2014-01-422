@@ -33,7 +33,7 @@ cblock 	0x20 			;start of general purpose registers
 
 ;start main code here
 	
-	start			movlw	0x00		
+	start		movlw	0x00		
 				movwf	PORTB		;light is off at the execution of this line
 				call	delay275	;more accurately, delay274_996
 			
