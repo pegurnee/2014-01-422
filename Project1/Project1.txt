@@ -47,53 +47,54 @@ cblock 	0x20 			;start of general purpose registers
 ;Precondition: there are locations declared for inLoop and outLoop
 ;Postcondition: 274_996 microseconds have passed, and inLoop and outLoop both have 0x00
 delay275			movlw	0xCC		;decimal 204
-				movwf	outLoop
+					movwf	outLoop
 			
 d275_outer			movlw	0x3D		;decimal 61
-				movwf	midLoop
+					movwf	midLoop
 			
 	d275_middle		movlw	0x10		;decimal 16
-				movwf	inLoop
+					movwf	inLoop
 
 		d275_inner	decfsz	inLoop, f
-				goto	d275_inner
-				nop
+					goto	d275_inner
+					nop
 
-				decfsz	midLoop, f
-				goto	d275_middle
-				nop			
+					decfsz	midLoop, f
+					goto	d275_middle
+					nop			
 			
-				decfsz	outLoop, f
-				goto	d275_outer
-				nop			;helps keep the math beautiful (offsets the -1 microsecond from skipping goto)
+					decfsz	outLoop, f
+					goto	d275_outer
+					nop					;helps keep the math beautiful (offsets the -1 microsecond from skipping goto)
 			
-			return
+				return
 
 ;Subroutine: delay180
 ;Used to delay the program for 149_994 milliseconds (approximately 180 milliseconds)
 ;Precondition: there are locations declared for inLoop and outLoop
 ;Postcondition: 194_994 microseconds have passed, and inLoop and outLoop both have 0x00
 delay180			movlw	0xCD		;decimal 205
-				movwf	outLoop
+					movwf	outLoop
 			
 d180_outer			movlw	0x17		;decimal 23
-				movwf	inLoop
+					movwf	midLoop
 			
-	d180_inner1		decfsz	inLoop, f
-				goto	d180_inner1
-				nop
+	d180_middle		movlw	0x26		;decimal 38
+					movwf	inLoop
+	
+		d180_inner	decfsz	inLoop, f
+					goto	d180_inner
+					nop
+					
+					decfsz	midLoop, f
+					goto	d180_middle
+					nop
 				
-				movlw	0x26		;decimal 38
-				movwf	inLoop
-	d180_inner2		decfsz	inLoop, f
-				goto	d180_inner2
-				nop
-				
-				decfsz	outLoop, f
-				goto	d180_outer
-				nop			;helps keep the math beautiful (offsets the -1 microsecond from skipping goto)
+					decfsz	outLoop, f
+					goto	d180_outer
+					nop					;helps keep the math beautiful (offsets the -1 microsecond from skipping goto)
 			
-			return
+				return
 	
 ; don't forget the word 'end'
 	end
