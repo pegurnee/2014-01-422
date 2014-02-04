@@ -14,12 +14,12 @@ cblock 	0x20 			;start of general purpose registers
 		count1 			;used in delay routine
 		counta 			;used in delay routine 
 		countb 			;used in delay routine
+		e
+		d
+		i
+		
 	endc
 	
-e equ 0x4F	;in reverse order: 0x79
-d equ 0x3D	;in reverse order: 0x5E
-i equ 0x30	;in reverse order: 0x06
-
 ;the following lines turn off the comparators
 	movlw	0x07
 	movwf	CMCON		;turn comparators off (make it like a 16F84)
@@ -34,7 +34,13 @@ i equ 0x30	;in reverse order: 0x06
 	bcf		STATUS,RP0		;return to bank 0
 
 ;actual code follows here
-	
+		movlw	0x9E
+		movwf	e
+		movlw	0x7A
+		movwf	d
+		movlw	0x60
+		movwf	i
+		
 start	movf	e, w
 		call	display
 		movf	d, w
@@ -52,9 +58,13 @@ start	movf	e, w
 ;Displays a digit on a seven-segment display
 ;Precondition: the hexcode for a 7-segment display digit is in the 'w' register
 ;Postcondition: the digit is displayed on the 7-segment display, and ~250 milliseconds pass
-display	movwf	PORTB
+display	bsf		STATUS,RP0
+		movwf	TRISB
+		bcf		STATUS,RP0
 		call	del_250
-		clrf	PORTB
+		bsf		STATUS,RP0
+		clrf	TRISB
+		bcf		STATUS,RP0
 		call	del_10
 		return
 		
@@ -62,21 +72,21 @@ display	movwf	PORTB
 ;Delays for a span of time - taken directly from http://www.emunix.emich.edu/~sverdlik/COSC422/PICDelay.html
 ;Made a few adjustments for style
 ;Precondition: nothing specific
-;Postcondition: the program delays for a variety of times
-del_0	retlw	0x00			;delay 0mS - return immediately
-del_1	movlw	0x01			;delay 1mS
+;Postcondition: the program delays for a variety of times, and 0x00 is in the 'w' register
+del_0	retlw	0x00			;delay 0ms - return immediately
+del_1	movlw	0x01			;delay 1ms
 		goto	delay
-del_5	movlw	0x05			;delay 5mS
+del_5	movlw	0x05			;delay 5ms
 		goto	delay
-del_10	movlw	0x0A			;delay 10mS
+del_10	movlw	0x0A			;delay 10ms
 		goto	delay
-del_20	movlw	0x14			;delay 20mS
+del_20	movlw	0x14			;delay 20ms
 		goto	delay
-del_50	movlw	0x32			;delay 50mS
+del_50	movlw	0x32			;delay 50ms
 		goto	delay
-del_100	movlw	0x64			;delay 100mS
+del_100	movlw	0x64			;delay 100ms
 		goto	delay
-del_250	movlw	0xFA			;delay 250 ms
+del_250	movlw	0xFA			;delay 250ms
 
 delay	movwf	count1
 d_in	movlw	0xC7			;delay 1mS
