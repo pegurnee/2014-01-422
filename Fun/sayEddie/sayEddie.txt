@@ -58,12 +58,9 @@ start	movf	e, w
 ;Displays a digit on a seven-segment display
 ;Precondition: the hexcode for a 7-segment display digit is in the 'w' register
 ;Postcondition: the digit is displayed on the 7-segment display, and ~250 milliseconds pass
-display	bsf		STATUS,RP0
-		movwf	TRISB
-		bcf		STATUS,RP0
+display	movwf	PORTB
 		call	del_250
-		bsf		STATUS,RP0
-		clrf	TRISB
+		clrf	PORTB
 		bcf		STATUS,RP0
 		call	del_10
 		return
