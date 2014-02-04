@@ -1,0 +1,57 @@
+MPLINK 4.49, Linker
+Linker Map File - Created Sat Feb 01 06:34:51 2014
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x00006a
+ .config_2007_SAYNICOLE.O       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000034      
+                            0x002007    0x002007      
+            54 out of 2182 program addresses used, program memory utilization is 2%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                     d_in   0x00002a    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                   d_loop   0x00002e    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                    del_0   0x00001b    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                    del_1   0x00001c    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                   del_10   0x000020    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                  del_100   0x000026    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                   del_20   0x000022    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                  del_250   0x000028    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                    del_5   0x00001e    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                   del_50   0x000024    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                    delay   0x000029    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                  display   0x000016    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                    start   0x000008    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                    start   0x000008    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                  display   0x000016    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                    del_0   0x00001b    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                    del_1   0x00001c    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                    del_5   0x00001e    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                   del_10   0x000020    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                   del_20   0x000022    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                   del_50   0x000024    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                  del_100   0x000026    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                  del_250   0x000028    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                    delay   0x000029    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                     d_in   0x00002a    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+                   d_loop   0x00002e    program     static F:\GitRepos\COSC422\Fun\sayNicole\sayNicole.asm
+
+
