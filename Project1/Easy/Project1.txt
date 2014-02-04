@@ -35,66 +35,52 @@ cblock 	0x20 		;start of general purpose registers
 	
 	start		movlw	0x00		
 				movwf	PORTB		;light is off at the execution of this line
-				call	delay275	;more accurately, delay274_996
+				call	delay275	;
 			
 				movlw	0xFF
 				movwf	PORTB		;light is on at the execution of this line
-				call	delay180	;also more accurately delay179_994
+				call	delay180	;
 				goto	start
 				
-;Subroutine: delay275
-;Used to delay the program for 274_996 microseconds (approximately 275 milliseconds)
-;Precondition: there are locations declared for inLoop and outLoop
-;Postcondition: 274_996 microseconds have passed, and inLoop and outLoop both have 0x00
-delay275			movlw	0xCC		;decimal 204
-					movwf	outLoop
-			
-d275_outer			movlw	0x3D		;decimal 61
-					movwf	midLoop
-			
-	d275_middle		movlw	0x10		;decimal 16
-					movwf	inLoop
-
-		d275_inner	decfsz	inLoop, f
-					goto	d275_inner
-					nop
-
-					decfsz	midLoop, f
-					goto	d275_middle
-					nop			
-			
-					decfsz	outLoop, f
-					goto	d275_outer
-					nop					;helps keep the math beautiful (offsets the -1 microsecond from skipping goto)
-			
+delay275 		call	Del250
+				call	Del25
 				return
 
-;Subroutine: delay180
-;Used to delay the program for 149_994 milliseconds (approximately 180 milliseconds)
-;Precondition: there are locations declared for inLoop and outLoop
-;Postcondition: 194_994 microseconds have passed, and inLoop and outLoop both have 0x00
-delay180			movlw	0xCD		;decimal 205
-					movwf	outLoop
-			
-d180_outer			movlw	0x17		;decimal 23
-					movwf	midLoop
-			
-	d180_middle		movlw	0x26		;decimal 38
-					movwf	inLoop
-	
-		d180_inner	decfsz	inLoop, f
-					goto	d180_inner
-					nop
-					
-					decfsz	midLoop, f
-					goto	d180_middle
-					nop
+delay180		call	Del100
+				call	Del50
+				call	Del20
+				call	Del10
+				return
 				
-					decfsz	outLoop, f
-					goto	d180_outer
-					nop					;helps keep the math beautiful (offsets the -1 microsecond from skipping goto)
-			
-				return
+Del0	retlw	0x00			;delay 0mS - return immediately
+Del1	movlw	d'1'			;delay 1mS
+		goto	Delay
+Del5	movlw	d'5'			;delay 5mS
+		goto	Delay
+Del10	movlw	d'10'			;delay 10mS
+		goto	Delay
+Del20	movlw	d'20'			;delay 20mS
+		goto	Delay
+Del50	movlw	d'50'			;delay 50mS
+		goto	Delay
+Del100	movlw	d'100'			;delay 100mS
+		goto	Delay
+Del250	movlw	d'250'			;delay 250 ms
+Delay	movwf	count1
+d1		movlw	0xC7			;delay 1mS
+		movwf	counta
+		movlw	0x01
+		movwf	countb
+Delay_0
+		decfsz	counta, f
+		goto	$+2
+		decfsz	countb, f
+		goto	Delay_0
+
+		decfsz	count1, f
+		goto	d1
+		retlw	0x00
+
 	
 ; don't forget the word 'end'
 	end
