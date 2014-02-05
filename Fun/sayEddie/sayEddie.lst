@@ -1,4 +1,4 @@
-MPASM  5.51                      SAYEDDIE.ASM   2-3-2014  22:45:48         PAGE  1
+MPASM  5.51                      SAYEDDIE.ASM   2-5-2014  3:25:35         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -52,12 +52,12 @@ Message[302]: Register in operand not in bank 0.  Ensure that bank bits are corr
 0007   1283           00034         bcf             STATUS,RP0              ;return to bank 0
                       00035 
                       00036 ;actual code follows here
-0008   309E           00037                 movlw   0x9E
+0008   3079           00037                 movlw   b'01111001'     ; 1001 1110
 0009   00A3           00038                 movwf   e
-000A   307A           00039                 movlw   0x7A
+000A   305E           00039                 movlw   b'01011110'     ; 0111 1010
 000B   00A4           00040                 movwf   d
-000C   3060           00041                 movlw   0x60
-MPASM  5.51                      SAYEDDIE.ASM   2-3-2014  22:45:48         PAGE  2
+000C   3006           00041                 movlw   b'00000110'     ; 0110 0000
+MPASM  5.51                      SAYEDDIE.ASM   2-5-2014  3:25:35         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -82,14 +82,12 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00058 ;Displays a digit on a seven-segment display
                       00059 ;Precondition: the hexcode for a 7-segment display digit is in the 'w' register
                       00060 ;Postcondition: the digit is displayed on the 7-segment display, and ~250 milliseconds pass
-001A   1683           00061 display bsf             STATUS,RP0
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-001B   0086           00062                 movwf   TRISB
-001C   1283           00063                 bcf             STATUS,RP0
+001A   0086           00061 display movwf   PORTB
+001B   2030           00062                 call    del_250
+001C   2030           00063                 call    del_250
 001D   2030           00064                 call    del_250
-001E   1683           00065                 bsf             STATUS,RP0
-Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-001F   0186           00066                 clrf    TRISB
+001E   2030           00065                 call    del_250
+001F   0186           00066                 clrf    PORTB
 0020   1283           00067                 bcf             STATUS,RP0
 0021   2028           00068                 call    del_10
 0022   0008           00069                 return
@@ -116,14 +114,14 @@ Message[302]: Register in operand not in bank 0.  Ensure that bank bits are corr
 0030   30FA           00089 del_250 movlw   0xFA                    ;delay 250ms
                       00090 
 0031   00A0           00091 delay   movwf   count1
-MPASM  5.51                      SAYEDDIE.ASM   2-3-2014  22:45:48         PAGE  3
+0032   30C7           00092 d_in    movlw   0xC7                    ;delay 1mS
+0033   00A1           00093                 movwf   counta
+MPASM  5.51                      SAYEDDIE.ASM   2-5-2014  3:25:35         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0032   30C7           00092 d_in    movlw   0xC7                    ;delay 1mS
-0033   00A1           00093                 movwf   counta
 0034   3001           00094                 movlw   0x01
 0035   00A2           00095                 movwf   countb
 0036   0BA1           00096 d_loop  decfsz  counta, f
@@ -136,7 +134,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00103                 
                       00104 ; don't forget the word 'end' (it ends the code)
                       00105         end
-MPASM  5.51                      SAYEDDIE.ASM   2-3-2014  22:45:48         PAGE  4
+MPASM  5.51                      SAYEDDIE.ASM   2-5-2014  3:25:35         PAGE  4
 
 
 SYMBOL TABLE
@@ -195,7 +193,7 @@ NOT_BOD                           00000000
 NOT_BOR                           00000000
 NOT_PD                            00000003
 NOT_POR                           00000001
-MPASM  5.51                      SAYEDDIE.ASM   2-3-2014  22:45:48         PAGE  5
+MPASM  5.51                      SAYEDDIE.ASM   2-5-2014  3:25:35         PAGE  5
 
 
 SYMBOL TABLE
@@ -254,7 +252,7 @@ STATUS                            00000003
 SYNC                              00000004
 T0CS                              00000005
 T0IE                              00000005
-MPASM  5.51                      SAYEDDIE.ASM   2-3-2014  22:45:48         PAGE  6
+MPASM  5.51                      SAYEDDIE.ASM   2-5-2014  3:25:35         PAGE  6
 
 
 SYMBOL TABLE
@@ -313,7 +311,7 @@ TXIE                              00000004
 TXIF                              00000004
 TXREG                             00000019
 TXSTA                             00000098
-MPASM  5.51                      SAYEDDIE.ASM   2-3-2014  22:45:48         PAGE  7
+MPASM  5.51                      SAYEDDIE.ASM   2-5-2014  3:25:35         PAGE  7
 
 
 SYMBOL TABLE
@@ -372,7 +370,7 @@ _PWRTE_ON                         00003FF7
 _WDTE_OFF                         00003FFB
 _WDTE_ON                          00003FFF
 _WDT_OFF                          00003FFB
-MPASM  5.51                      SAYEDDIE.ASM   2-3-2014  22:45:48         PAGE  8
+MPASM  5.51                      SAYEDDIE.ASM   2-5-2014  3:25:35         PAGE  8
 
 
 SYMBOL TABLE
@@ -415,6 +413,6 @@ Program Memory Words Free:  1987
 
 Errors   :     0
 Warnings :     1 reported,     0 suppressed
-Messages :     4 reported,     0 suppressed
+Messages :     2 reported,     0 suppressed
 
 

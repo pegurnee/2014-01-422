@@ -34,11 +34,11 @@ cblock 	0x20 			;start of general purpose registers
 	bcf		STATUS,RP0		;return to bank 0
 
 ;actual code follows here
-		movlw	0x9E
+		movlw	b'01111001'	; 1001 1110
 		movwf	e
-		movlw	0x7A
+		movlw	b'01011110'	; 0111 1010
 		movwf	d
-		movlw	0x60
+		movlw	b'00000110'	; 0110 0000
 		movwf	i
 		
 start	movf	e, w
@@ -58,12 +58,12 @@ start	movf	e, w
 ;Displays a digit on a seven-segment display
 ;Precondition: the hexcode for a 7-segment display digit is in the 'w' register
 ;Postcondition: the digit is displayed on the 7-segment display, and ~250 milliseconds pass
-display	bsf		STATUS,RP0
-		movwf	TRISB
-		bcf		STATUS,RP0
+display	movwf	PORTB
 		call	del_250
-		bsf		STATUS,RP0
-		clrf	TRISB
+		call	del_250
+		call	del_250
+		call	del_250
+		clrf	PORTB
 		bcf		STATUS,RP0
 		call	del_10
 		return
