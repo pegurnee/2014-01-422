@@ -1,4 +1,4 @@
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  3:52:43         PAGE  1
+MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -57,7 +57,7 @@ Message[302]: Register in operand not in bank 0.  Ensure that bank bits are corr
                       00039 
                       00040 ;actual code follows here
 0008   303F           00041                         movlw   b'00111111'
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  3:52:43         PAGE  2
+MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -81,81 +81,83 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00057         
 Warning[207]: Found label after column 1. (start)
 0018   0823           00058         start   movf    led_0, w
-0019   2029           00059                         call    display
+0019   202B           00059                         call    display
 001A   0824           00060                         movf    led_1, w
-001B   2029           00061                         call    display
+001B   202B           00061                         call    display
 001C   0825           00062                         movf    led_2, w
-001D   2029           00063                         call    display
+001D   202B           00063                         call    display
 001E   0826           00064                         movf    led_3, w
-001F   2029           00065                         call    display
+001F   202B           00065                         call    display
 0020   0827           00066                         movf    led_4, w
-0021   2029           00067                         call    display
+0021   202B           00067                         call    display
 0022   0828           00068                         movf    led_5, w
-0023   2029           00069                         call    display
+0023   202B           00069                         call    display
 0024   0829           00070                         movf    led_6, w
-0025   2029           00071                         call    display
+0025   202B           00071                         call    display
 0026   082A           00072                         movf    led_7, w
-0027   2029           00073                         call    display
-0028   2818           00074                         goto    start
-                      00075                                 
-                      00076 ;Subroutine: display
-                      00077 ;Displays a digit on a seven-segment display
-                      00078 ;Precondition: the hexcode for a 7-segment display digit is in the 'w' register
-                      00079 ;Postcondition: the digit is displayed on the 7-segment display, and ~250 milliseconds pass
-0029   0086           00080 display movwf   PORTB
-002A   203F           00081                 call    del_250
-002B   203F           00082                 call    del_250
-002C   203F           00083                 call    del_250
-002D   203F           00084                 call    del_250
-002E   0186           00085                 clrf    PORTB
-002F   1283           00086                 bcf             STATUS,RP0
-0030   2037           00087                 call    del_10
-0031   0008           00088                 return
-                      00089                 
-                      00090 ;Subroutine: delay
-                      00091 ;Delays for a span of time - taken directly from http://www.emunix.emich.edu/~sverdlik/COSC422/PICDelay.
-                            html
-                      00092 ;Made a few adjustments for style
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  3:52:43         PAGE  3
+0027   202B           00073                         call    display
+0028   3000           00074                         movlw   0x00
+0029   202B           00075                         call    display
+002A   2818           00076                         goto    start
+                      00077                                 
+                      00078 ;Subroutine: display
+                      00079 ;Displays a digit on a seven-segment display
+                      00080 ;Precondition: the hexcode for a 7-segment display digit is in the 'w' register
+                      00081 ;Postcondition: the digit is displayed on the 7-segment display, and ~250 milliseconds pass
+002B   0086           00082 display movwf   PORTB
+002C   2041           00083                 call    del_250
+002D   2041           00084                 call    del_250
+002E   2041           00085                 call    del_250
+002F   2041           00086                 call    del_250
+0030   0186           00087                 clrf    PORTB
+0031   1283           00088                 bcf             STATUS,RP0
+0032   2039           00089                 call    del_10
+0033   0008           00090                 return
+                      00091                 
+                      00092 ;Subroutine: delay
+                      00093 ;Delays for a span of time - taken directly from http://www.emunix.emich.edu/~sverdlik/COSC422/PICDelay.
+MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00093 ;Precondition: nothing specific
-                      00094 ;Postcondition: the program delays for a variety of times, and 0x00 is in the 'w' register
-0032   3400           00095 del_0   retlw   0x00                    ;delay 0ms - return immediately
-0033   3001           00096 del_1   movlw   0x01                    ;delay 1ms
-0034   2840           00097                 goto    delay
-0035   3005           00098 del_5   movlw   0x05                    ;delay 5ms
-0036   2840           00099                 goto    delay
-0037   300A           00100 del_10  movlw   0x0A                    ;delay 10ms
-0038   2840           00101                 goto    delay
-0039   3014           00102 del_20  movlw   0x14                    ;delay 20ms
-003A   2840           00103                 goto    delay
-003B   3032           00104 del_50  movlw   0x32                    ;delay 50ms
-003C   2840           00105                 goto    delay
-003D   3064           00106 del_100 movlw   0x64                    ;delay 100ms
-003E   2840           00107                 goto    delay
-003F   30FA           00108 del_250 movlw   0xFA                    ;delay 250ms
-                      00109 
-0040   00A0           00110 delay   movwf   count1
-0041   30C7           00111 d_in    movlw   0xC7                    ;delay 1mS
-0042   00A1           00112                 movwf   counta
-0043   3001           00113                 movlw   0x01
-0044   00A2           00114                 movwf   countb
-0045   0BA1           00115 d_loop  decfsz  counta, f
-0046   2848           00116                 goto    $+2
-0047   0BA2           00117                 decfsz  countb, f
-0048   2845           00118                 goto    d_loop
-0049   0BA0           00119                 decfsz  count1  ,f
-004A   2841           00120                 goto    d_in
-004B   3400           00121                 retlw   0x00
-                      00122 
-                      00123 
-                      00124 ; don't forget the word 'end' (it ends the code)
-                      00125         end
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  3:52:43         PAGE  4
+                            html
+                      00094 ;Made a few adjustments for style
+                      00095 ;Precondition: nothing specific
+                      00096 ;Postcondition: the program delays for a variety of times, and 0x00 is in the 'w' register
+0034   3400           00097 del_0   retlw   0x00                    ;delay 0ms - return immediately
+0035   3001           00098 del_1   movlw   0x01                    ;delay 1ms
+0036   2842           00099                 goto    delay
+0037   3005           00100 del_5   movlw   0x05                    ;delay 5ms
+0038   2842           00101                 goto    delay
+0039   300A           00102 del_10  movlw   0x0A                    ;delay 10ms
+003A   2842           00103                 goto    delay
+003B   3014           00104 del_20  movlw   0x14                    ;delay 20ms
+003C   2842           00105                 goto    delay
+003D   3032           00106 del_50  movlw   0x32                    ;delay 50ms
+003E   2842           00107                 goto    delay
+003F   3064           00108 del_100 movlw   0x64                    ;delay 100ms
+0040   2842           00109                 goto    delay
+0041   30FA           00110 del_250 movlw   0xFA                    ;delay 250ms
+                      00111 
+0042   00A0           00112 delay   movwf   count1
+0043   30C7           00113 d_in    movlw   0xC7                    ;delay 1mS
+0044   00A1           00114                 movwf   counta
+0045   3001           00115                 movlw   0x01
+0046   00A2           00116                 movwf   countb
+0047   0BA1           00117 d_loop  decfsz  counta, f
+0048   284A           00118                 goto    $+2
+0049   0BA2           00119                 decfsz  countb, f
+004A   2847           00120                 goto    d_loop
+004B   0BA0           00121                 decfsz  count1  ,f
+004C   2843           00122                 goto    d_in
+004D   3400           00123                 retlw   0x00
+                      00124 
+                      00125 
+                      00126 ; don't forget the word 'end' (it ends the code)
+                      00127         end
+MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  4
 
 
 SYMBOL TABLE
@@ -214,7 +216,7 @@ NOT_BOD                           00000000
 NOT_BOR                           00000000
 NOT_PD                            00000003
 NOT_POR                           00000001
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  3:52:43         PAGE  5
+MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  5
 
 
 SYMBOL TABLE
@@ -273,7 +275,7 @@ STATUS                            00000003
 SYNC                              00000004
 T0CS                              00000005
 T0IE                              00000005
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  3:52:43         PAGE  6
+MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  6
 
 
 SYMBOL TABLE
@@ -332,7 +334,7 @@ TXIE                              00000004
 TXIF                              00000004
 TXREG                             00000019
 TXSTA                             00000098
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  3:52:43         PAGE  7
+MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  7
 
 
 SYMBOL TABLE
@@ -391,7 +393,7 @@ _PWRTE_ON                         00003FF7
 _WDTE_OFF                         00003FFB
 _WDTE_ON                          00003FFF
 _WDT_OFF                          00003FFB
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  3:52:43         PAGE  8
+MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  8
 
 
 SYMBOL TABLE
@@ -403,18 +405,18 @@ __16F628                          00000001
 count1                            00000020
 counta                            00000021
 countb                            00000022
-d_in                              00000041
-d_loop                            00000045
-del_0                             00000032
-del_1                             00000033
-del_10                            00000037
-del_100                           0000003D
-del_20                            00000039
-del_250                           0000003F
-del_5                             00000035
-del_50                            0000003B
-delay                             00000040
-display                           00000029
+d_in                              00000043
+d_loop                            00000047
+del_0                             00000034
+del_1                             00000035
+del_10                            00000039
+del_100                           0000003F
+del_20                            0000003B
+del_250                           00000041
+del_5                             00000037
+del_50                            0000003D
+delay                             00000042
+display                           0000002B
 led_0                             00000023
 led_1                             00000024
 led_2                             00000025
@@ -429,13 +431,13 @@ start                             00000018
 MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
 
 0000 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
-0040 : XXXXXXXXXXXX---- ---------------- ---------------- ----------------
+0040 : XXXXXXXXXXXXXX-- ---------------- ---------------- ----------------
 2000 : -------X-------- ---------------- ---------------- ----------------
 
 All other memory blocks unused.
 
-Program Memory Words Used:    76
-Program Memory Words Free:  1972
+Program Memory Words Used:    78
+Program Memory Words Free:  1970
 
 
 Errors   :     0

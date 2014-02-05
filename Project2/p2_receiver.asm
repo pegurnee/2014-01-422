@@ -71,6 +71,8 @@ cblock 	0x20 			;start of general purpose registers
 			call	display
 			movf	led_7, w
 			call	display
+			movlw	0x00
+			call	display
 			goto	start
 				
 ;Subroutine: display
