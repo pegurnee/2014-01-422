@@ -14,15 +14,14 @@ cblock 	0x20 			;start of general purpose registers
 		count1 			;used in delay routine
 		counta 			;used in delay routine 
 		countb 			;used in delay routine
+		n
+		i
+		c
+		o
+		l
+		e
 	endc
 	
-n equ 0x2A	;iro: 1010100 + f0
-i equ 0x20 	;iro: 0000100 + f0
-c equ 0x1A	;iro: 1011000 + f0
-o equ 0x3A	;iro: 1011100 + f0
-l equ 0x30	;in reverse order: 0x06
-e equ 0x4F	;in reverse order: 0x79
-
 ;the following lines turn off the comparators
 	movlw	0x07
 	movwf	CMCON		;turn comparators off (make it like a 16F84)
@@ -38,6 +37,19 @@ e equ 0x4F	;in reverse order: 0x79
 
 ;actual code follows here
 	
+		movlw	b'01010100'	;
+		movwf	n
+		movlw	b'00000100'	;
+		movwf	i
+		movlw	b'01011000'	;
+		movwf	c
+		movlw	b'01011100'	;
+		movwf	o
+		movlw	b'00000110'	;
+		movwf	l
+		movlw	b'01111001'	;
+		movwf	e
+		
 start	movf	n, w
 		call	display
 		movf	i, w
@@ -58,6 +70,9 @@ start	movf	n, w
 ;Precondition: the hexcode for a 7-segment display digit is in the 'w' register
 ;Postcondition: the digit is displayed on the 7-segment display, and ~250 milliseconds pass
 display	movwf	PORTB
+		call	del_250
+		call	del_250
+		call	del_250
 		call	del_250
 		clrf	PORTB
 		call	del_10

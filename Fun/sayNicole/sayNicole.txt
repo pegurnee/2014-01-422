@@ -37,17 +37,17 @@ cblock 	0x20 			;start of general purpose registers
 
 ;actual code follows here
 	
-		movlw	0x2A	;iro: 1010100 + f0
+		movlw	b'01010100'	;
 		movwf	n
-		movlw	0x20 	;iro: 0000100 + f0
+		movlw	b'00000100'	;
 		movwf	i
-		movlw	0x1A	;iro: 1011000 + f0
+		movlw	b'01011000'	;
 		movwf	c
-		movlw	0x3A	;iro: 1011100 + f0
+		movlw	b'01011100'	;
 		movwf	o
-		movlw	0x30	;in reverse order: 0x06
+		movlw	b'00000110'	;
 		movwf	l
-		movlw	0x4F	;in reverse order: 0x79
+		movlw	b'01111001'	;
 		movwf	e
 		
 start	movf	n, w
@@ -70,6 +70,9 @@ start	movf	n, w
 ;Precondition: the hexcode for a 7-segment display digit is in the 'w' register
 ;Postcondition: the digit is displayed on the 7-segment display, and ~250 milliseconds pass
 display	movwf	PORTB
+		call	del_250
+		call	del_250
+		call	del_250
 		call	del_250
 		clrf	PORTB
 		call	del_10
