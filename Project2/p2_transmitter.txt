@@ -1,3 +1,4 @@
+;NICOLIFIED
 ;p2_transmitter.txt
 ;Depending on the number of high power wires attached, sends data to the p2_receiver chip
 ;@author: Eddie Gurnee
