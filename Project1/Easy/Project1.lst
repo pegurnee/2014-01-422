@@ -1,4 +1,4 @@
-MPASM  5.51                      PROJECT1.ASM   2-5-2014  3:34:25         PAGE  1
+MPASM  5.51                      PROJECT1.ASM   2-8-2014  23:22:51         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -52,12 +52,12 @@ Message[302]: Register in operand not in bank 0.  Ensure that bank bits are corr
                       00034 ;start main code here
                       00035         
 Warning[207]: Found label after column 1. (start)
-0008   3000           00036         start           movlw   0x00            
+0008   30FF           00036         start           movlw   0xFF            
 0009   0086           00037                                 movwf   PORTB           ;light is off at the execution of this line
 000A   200F           00038                                 call    delay275        ;
                       00039                         
-000B   30FF           00040                                 movlw   0xFF
-MPASM  5.51                      PROJECT1.ASM   2-5-2014  3:34:25         PAGE  2
+000B   3000           00040                                 movlw   0x00
+MPASM  5.51                      PROJECT1.ASM   2-8-2014  23:22:51         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -110,7 +110,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00085         
                       00086 ; don't forget the word 'end'
                       00087         end
-MPASM  5.51                      PROJECT1.ASM   2-5-2014  3:34:25         PAGE  3
+MPASM  5.51                      PROJECT1.ASM   2-8-2014  23:22:51         PAGE  3
 
 
 SYMBOL TABLE
@@ -169,7 +169,7 @@ FERR                              00000002
 FSR                               00000004
 GIE                               00000007
 INDF                              00000000
-MPASM  5.51                      PROJECT1.ASM   2-5-2014  3:34:25         PAGE  4
+MPASM  5.51                      PROJECT1.ASM   2-8-2014  23:22:51         PAGE  4
 
 
 SYMBOL TABLE
@@ -228,7 +228,7 @@ RCREG                             0000001A
 RCSTA                             00000018
 RD                                00000000
 RP0                               00000005
-MPASM  5.51                      PROJECT1.ASM   2-5-2014  3:34:25         PAGE  5
+MPASM  5.51                      PROJECT1.ASM   2-8-2014  23:22:51         PAGE  5
 
 
 SYMBOL TABLE
@@ -287,7 +287,7 @@ TRISB2                            00000002
 TRISB3                            00000003
 TRISB4                            00000004
 TRISB5                            00000005
-MPASM  5.51                      PROJECT1.ASM   2-5-2014  3:34:25         PAGE  6
+MPASM  5.51                      PROJECT1.ASM   2-8-2014  23:22:51         PAGE  6
 
 
 SYMBOL TABLE
@@ -346,7 +346,7 @@ _IDLOC2                           00002002
 _IDLOC3                           00002003
 _INTRC_OSC_CLKOUT                 00003FFD
 _INTRC_OSC_NOCLKOUT               00003FFC
-MPASM  5.51                      PROJECT1.ASM   2-5-2014  3:34:25         PAGE  7
+MPASM  5.51                      PROJECT1.ASM   2-8-2014  23:22:51         PAGE  7
 
 
 SYMBOL TABLE

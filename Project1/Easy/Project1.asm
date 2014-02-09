@@ -33,11 +33,11 @@ cblock 	0x20 		;start of general purpose registers
 
 ;start main code here
 	
-	start		movlw	0x00		
+	start		movlw	0xFF		
 				movwf	PORTB		;light is off at the execution of this line
 				call	delay275	;
 			
-				movlw	0xFF
+				movlw	0x00
 				movwf	PORTB		;light is on at the execution of this line
 				call	delay180	;
 				goto	start
