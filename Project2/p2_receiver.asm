@@ -33,7 +33,7 @@ cblock 	0x20 			;start of general purpose registers
 	bsf		STATUS,RP0
 	movlw	0x00
 	movwf	TRISB			;PORTB is output
-	movlw	0xff
+	movlw	0xFF
 	movwf	TRISA			;PORTA is input
 	bcf		STATUS,RP0		;return to bank 0
 

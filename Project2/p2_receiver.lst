@@ -1,4 +1,4 @@
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  1
+MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -50,14 +50,14 @@ Warning[205]: Found directive in column 1. (cblock)
 0003   3000           00034         movlw   0x00
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
 0004   0086           00035         movwf   TRISB                   ;PORTB is output
-0005   30FF           00036         movlw   0xff
+0005   30FF           00036         movlw   0xFF
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
 0006   0085           00037         movwf   TRISA                   ;PORTA is input
 0007   1283           00038         bcf             STATUS,RP0              ;return to bank 0
                       00039 
                       00040 ;actual code follows here
 0008   303F           00041                         movlw   b'00111111'
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  2
+MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -116,7 +116,7 @@ Warning[207]: Found label after column 1. (start)
                       00091                 
                       00092 ;Subroutine: delay
                       00093 ;Delays for a span of time - taken directly from http://www.emunix.emich.edu/~sverdlik/COSC422/PICDelay.
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  3
+MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -157,7 +157,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00125 
                       00126 ; don't forget the word 'end' (it ends the code)
                       00127         end
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  4
+MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  4
 
 
 SYMBOL TABLE
@@ -216,7 +216,7 @@ NOT_BOD                           00000000
 NOT_BOR                           00000000
 NOT_PD                            00000003
 NOT_POR                           00000001
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  5
+MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  5
 
 
 SYMBOL TABLE
@@ -275,7 +275,7 @@ STATUS                            00000003
 SYNC                              00000004
 T0CS                              00000005
 T0IE                              00000005
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  6
+MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  6
 
 
 SYMBOL TABLE
@@ -334,7 +334,7 @@ TXIE                              00000004
 TXIF                              00000004
 TXREG                             00000019
 TXSTA                             00000098
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  7
+MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  7
 
 
 SYMBOL TABLE
@@ -393,7 +393,7 @@ _PWRTE_ON                         00003FF7
 _WDTE_OFF                         00003FFB
 _WDTE_ON                          00003FFF
 _WDT_OFF                          00003FFB
-MPASM  5.51                   P2_RECEIVER.ASM   2-5-2014  4:09:42         PAGE  8
+MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  8
 
 
 SYMBOL TABLE
