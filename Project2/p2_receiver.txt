@@ -22,6 +22,8 @@ cblock 	0x20 			;start of general purpose registers
 		led_5
 		led_6
 		led_7
+		sentNum
+		numBits
 	endc
 
 ;the following lines turn off the comparators
@@ -38,6 +40,24 @@ cblock 	0x20 			;start of general purpose registers
 	bcf		STATUS,RP0		;return to bank 0
 
 ;actual code follows here
+startPolling	btfsc	PORTA, 0x02
+				goto	startPolling
+				
+				movlw	0x00		;1us
+				movwf	sentNum		;2us
+				movlw	0x08		;3us
+				movwf	numBits		;4us
+				call	initWait	;52us (should be 48us, call costs 2)
+				
+readAll			call	bitWait		;156us (should be 104, call costs 2)
+				call 	readIn		;
+				decfsz	numBits, f	;
+				goto	readAll		;156us
+				
+				
+				
+				
+				
 			movlw	b'00111111'
 			movwf	led_0
 			movlw	b'00000110'
