@@ -1,4 +1,4 @@
-MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  1
+MPASM  5.51                   P2_RECEIVER.ASM   2-12-2014  5:25:39         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -27,7 +27,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00012 
 Warning[205]: Found directive in column 1. (cblock)
                       00013 cblock  0x20                    ;start of general purpose registers
-  00000020            00014                 count1                  ;used in delay routine
+  00000020            00014                 delayReg                ;used in delay routines
   00000021            00015                 counta                  ;used in delay routine 
   00000022            00016                 countb                  ;used in delay routine
   00000023            00017                 led_0
@@ -38,126 +38,163 @@ Warning[205]: Found directive in column 1. (cblock)
   00000028            00022                 led_5
   00000029            00023                 led_6
   0000002A            00024                 led_7
-                      00025         endc
-                      00026 
-                      00027 ;the following lines turn off the comparators
-0000   3007           00028         movlw   0x07
-0001   009F           00029         movwf   CMCON           ;turn comparators off (make it like a 16F84)
-                      00030         
-                      00031 ;We must change memory banks to set the TRIS registers
-                      00032 
-0002   1683           00033         bsf             STATUS,RP0
-0003   3000           00034         movlw   0x00
+  0000002B            00025                 sentNum
+  0000002C            00026                 numBits
+                      00027         endc
+                      00028 
+                      00029 ;the following lines turn off the comparators
+0000   3007           00030         movlw   0x07
+0001   009F           00031         movwf   CMCON           ;turn comparators off (make it like a 16F84)
+                      00032         
+                      00033 ;We must change memory banks to set the TRIS registers
+                      00034 
+0002   1683           00035         bsf             STATUS,RP0
+0003   3000           00036         movlw   0x00
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0004   0086           00035         movwf   TRISB                   ;PORTB is output
-0005   30FF           00036         movlw   0xFF
+0004   0086           00037         movwf   TRISB                   ;PORTB is output
+0005   30FF           00038         movlw   0xFF
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0006   0085           00037         movwf   TRISA                   ;PORTA is input
-0007   1283           00038         bcf             STATUS,RP0              ;return to bank 0
-                      00039 
-                      00040 ;actual code follows here
-0008   303F           00041                         movlw   b'00111111'
-MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  2
+0006   0085           00039         movwf   TRISA                   ;PORTA is input
+0007   1283           00040         bcf             STATUS,RP0              ;return to bank 0
+                      00041 
+MPASM  5.51                   P2_RECEIVER.ASM   2-12-2014  5:25:39         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0009   00A3           00042                         movwf   led_0
-000A   3006           00043                         movlw   b'00000110'
-000B   00A4           00044                         movwf   led_1
-000C   305B           00045                         movlw   b'01011011'
-000D   00A5           00046                         movwf   led_2
-000E   304F           00047                         movlw   b'01001111'
-000F   00A6           00048                         movwf   led_3
-0010   3066           00049                         movlw   b'01100110'
-0011   00A7           00050                         movwf   led_4
-0012   306D           00051                         movlw   b'01101101'
-0013   00A8           00052                         movwf   led_5
-0014   307D           00053                         movlw   b'01111101'
-0015   00A9           00054                         movwf   led_6
-0016   3007           00055                         movlw   b'00000111'
-0017   00AA           00056                         movwf   led_7
-                      00057         
-Warning[207]: Found label after column 1. (start)
-0018   0823           00058         start   movf    led_0, w
-0019   202B           00059                         call    display
-001A   0824           00060                         movf    led_1, w
-001B   202B           00061                         call    display
-001C   0825           00062                         movf    led_2, w
-001D   202B           00063                         call    display
-001E   0826           00064                         movf    led_3, w
-001F   202B           00065                         call    display
-0020   0827           00066                         movf    led_4, w
-0021   202B           00067                         call    display
-0022   0828           00068                         movf    led_5, w
-0023   202B           00069                         call    display
-0024   0829           00070                         movf    led_6, w
-0025   202B           00071                         call    display
-0026   082A           00072                         movf    led_7, w
-0027   202B           00073                         call    display
-0028   3000           00074                         movlw   0x00
-0029   202B           00075                         call    display
-002A   2818           00076                         goto    start
-                      00077                                 
-                      00078 ;Subroutine: display
-                      00079 ;Displays a digit on a seven-segment display
-                      00080 ;Precondition: the hexcode for a 7-segment display digit is in the 'w' register
-                      00081 ;Postcondition: the digit is displayed on the 7-segment display, and ~250 milliseconds pass
-002B   0086           00082 display movwf   PORTB
-002C   2041           00083                 call    del_250
-002D   2041           00084                 call    del_250
-002E   2041           00085                 call    del_250
-002F   2041           00086                 call    del_250
-0030   0186           00087                 clrf    PORTB
-0031   1283           00088                 bcf             STATUS,RP0
-0032   2039           00089                 call    del_10
-0033   0008           00090                 return
-                      00091                 
-                      00092 ;Subroutine: delay
-                      00093 ;Delays for a span of time - taken directly from http://www.emunix.emich.edu/~sverdlik/COSC422/PICDelay.
-MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  3
+                      00042 ;actual code follows here
+0008   303F           00043                                 movlw   b'00111111'
+0009   00A3           00044                                 movwf   led_0
+000A   3006           00045                                 movlw   b'00000110'
+000B   00A4           00046                                 movwf   led_1
+000C   305B           00047                                 movlw   b'01011011'
+000D   00A5           00048                                 movwf   led_2
+000E   304F           00049                                 movlw   b'01001111'
+000F   00A6           00050                                 movwf   led_3
+0010   3066           00051                                 movlw   b'01100110'
+0011   00A7           00052                                 movwf   led_4
+0012   306D           00053                                 movlw   b'01101101'
+0013   00A8           00054                                 movwf   led_5
+0014   307D           00055                                 movlw   b'01111101'
+0015   00A9           00056                                 movwf   led_6
+0016   3007           00057                                 movlw   b'00000111'
+0017   00AA           00058                                 movwf   led_7
+                      00059                         
+0018   1905           00060 startPolling    btfsc   PORTA, 0x02
+0019   2818           00061                                 goto    startPolling
+                      00062                                 
+001A   3000           00063                                 movlw   0x00            ;1us
+001B   00AB           00064                                 movwf   sentNum         ;2us
+001C   3008           00065                                 movlw   0x08            ;3us
+001D   00AC           00066                                 movwf   numBits         ;4us
+001E   204D           00067                                 call    initWait        ;6us - back at 151us (should be 148us, sets to r
+                            ight before the middle of the first bit to be read)
+                      00068                                 
+001F   2058           00069 readAll                 call    readIn          ;153us - back at 159us, 257us - back at 263us
+0020   2053           00070                                 call    bitWait         ;161us - back at 253us
+0021   0BAC           00071                                 decfsz  numBits, f      ;254us
+0022   281F           00072                                 goto    readAll         ;255us
+                      00073                                 
+0023   192B           00074                                 btfsc   sentNum, 0x02
+0024   282D           00075                                 goto    fourPlus
+0025   18AB           00076                                 btfsc   sentNum, 0x01
+0026   282A           00077                                 goto    twoPlus
+0027   182B           00078                                 btfsc   sentNum, 0x00
+0028   2838           00079                                 goto    isOne
+0029   2835           00080                                 goto    isZero
+                      00081                                 
+002A   182B           00082 twoPlus                 btfsc   sentNum, 0x00
+002B   283E           00083                                 goto    isThree
+002C   283B           00084                                 goto    isTwo
+                      00085                                 
+002D   18AB           00086 fourPlus                btfsc   sentNum, 0x01
+002E   2832           00087                                 goto    sixPlus
+002F   182B           00088                                 btfsc   sentNum, 0x00
+0030   2844           00089                                 goto    isFive
+0031   2841           00090                                 goto    isFour
+                      00091 
+0032   182B           00092 sixPlus                 btfsc   sentNum, 0x00
+0033   284A           00093                                 goto    isSeven
+MPASM  5.51                   P2_RECEIVER.ASM   2-12-2014  5:25:39         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                            html
-                      00094 ;Made a few adjustments for style
-                      00095 ;Precondition: nothing specific
-                      00096 ;Postcondition: the program delays for a variety of times, and 0x00 is in the 'w' register
-0034   3400           00097 del_0   retlw   0x00                    ;delay 0ms - return immediately
-0035   3001           00098 del_1   movlw   0x01                    ;delay 1ms
-0036   2842           00099                 goto    delay
-0037   3005           00100 del_5   movlw   0x05                    ;delay 5ms
-0038   2842           00101                 goto    delay
-0039   300A           00102 del_10  movlw   0x0A                    ;delay 10ms
-003A   2842           00103                 goto    delay
-003B   3014           00104 del_20  movlw   0x14                    ;delay 20ms
-003C   2842           00105                 goto    delay
-003D   3032           00106 del_50  movlw   0x32                    ;delay 50ms
-003E   2842           00107                 goto    delay
-003F   3064           00108 del_100 movlw   0x64                    ;delay 100ms
-0040   2842           00109                 goto    delay
-0041   30FA           00110 del_250 movlw   0xFA                    ;delay 250ms
-                      00111 
-0042   00A0           00112 delay   movwf   count1
-0043   30C7           00113 d_in    movlw   0xC7                    ;delay 1mS
-0044   00A1           00114                 movwf   counta
-0045   3001           00115                 movlw   0x01
-0046   00A2           00116                 movwf   countb
-0047   0BA1           00117 d_loop  decfsz  counta, f
-0048   284A           00118                 goto    $+2
-0049   0BA2           00119                 decfsz  countb, f
-004A   2847           00120                 goto    d_loop
-004B   0BA0           00121                 decfsz  count1  ,f
-004C   2843           00122                 goto    d_in
-004D   3400           00123                 retlw   0x00
-                      00124 
-                      00125 
-                      00126 ; don't forget the word 'end' (it ends the code)
-                      00127         end
-MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  4
+0034   2847           00094                                 goto    isSix                           
+                      00095                                 
+0035   0823           00096 isZero                  movf    led_0, w
+0036   0086           00097                                 movwf   PORTB
+0037   2818           00098                                 goto    startPolling
+0038   0824           00099 isOne                   movf    led_1, w
+0039   0086           00100                                 movwf   PORTB
+003A   2818           00101                                 goto    startPolling
+003B   0825           00102 isTwo                   movf    led_2, w
+003C   0086           00103                                 movwf   PORTB
+003D   2818           00104                                 goto    startPolling
+003E   0826           00105 isThree                 movf    led_3, w
+003F   0086           00106                                 movwf   PORTB
+0040   2818           00107                                 goto    startPolling
+0041   0827           00108 isFour                  movf    led_4, w
+0042   0086           00109                                 movwf   PORTB
+0043   2818           00110                                 goto    startPolling
+0044   0828           00111 isFive                  movf    led_5, w
+0045   0086           00112                                 movwf   PORTB
+0046   2818           00113                                 goto    startPolling
+0047   0829           00114 isSix                   movf    led_6, w
+0048   0086           00115                                 movwf   PORTB
+0049   2818           00116                                 goto    startPolling
+004A   082A           00117 isSeven                 movf    led_7, w
+004B   0086           00118                                 movwf   PORTB
+004C   2818           00119                                 goto    startPolling
+                      00120                                 
+                      00121 ;Subroutine: initWait
+                      00122 ;
+                      00123 ;Precondition: 
+                      00124 ;Postcondition: 
+004D   302E           00125 initWait                movlw   0x2E                    ;7us
+004E   00A0           00126                                 movwf   delayReg                ;8us
+004F   0BA0           00127 initWait_loop   decfsz  delayReg, f
+0050   284F           00128                                 goto    initWait_loop   
+                      00129                                                                                 ;147us
+0051   2852           00130                                 goto    $+1                             ;149us
+                      00131                                 
+0052   0008           00132                                 return                                  ;151us
+                      00133 
+                      00134 ;Subroutine: bitWait
+                      00135 ;
+                      00136 ;Precondition: 
+                      00137 ;Postcondition: 
+0053   301D           00138 bitWait                 movlw   0x1D
+0054   00A0           00139                                 movwf   delayReg
+0055   0BA0           00140 bitWait_loop    decfsz  delayReg, f
+0056   2855           00141                                 goto    bitWait_loop
+0057   0008           00142                                 return
+                      00143 
+                      00144                 
+                      00145 ;Subroutine: readIn
+                      00146 ;
+MPASM  5.51                   P2_RECEIVER.ASM   2-12-2014  5:25:39         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00147 ;Precondition: 
+                      00148 ;Postcondition: 
+0058   0DAB           00149 readIn  rlf             sentNum, f              ;154us, 258us
+0059   3001           00150                 movlw   0x01                    ;155us, 259us
+005A   1905           00151                 btfsc   PORTA, 0x02             ;156us should be exactly the middle of the message, 260u
+                            s
+005B   07AB           00152                 addwf   sentNum, f              ;157us, 261us
+                      00153                 
+005C   0008           00154                 return                                  ;159us, 263us
+                      00155 
+                      00156 
+                      00157 ; don't forget the word 'end' (it ends the code)
+                      00158         end
+MPASM  5.51                   P2_RECEIVER.ASM   2-12-2014  5:25:39         PAGE  5
 
 
 SYMBOL TABLE
@@ -216,7 +253,7 @@ NOT_BOD                           00000000
 NOT_BOR                           00000000
 NOT_PD                            00000003
 NOT_POR                           00000001
-MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  5
+MPASM  5.51                   P2_RECEIVER.ASM   2-12-2014  5:25:39         PAGE  6
 
 
 SYMBOL TABLE
@@ -275,7 +312,7 @@ STATUS                            00000003
 SYNC                              00000004
 T0CS                              00000005
 T0IE                              00000005
-MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  6
+MPASM  5.51                   P2_RECEIVER.ASM   2-12-2014  5:25:39         PAGE  7
 
 
 SYMBOL TABLE
@@ -334,7 +371,7 @@ TXIE                              00000004
 TXIF                              00000004
 TXREG                             00000019
 TXSTA                             00000098
-MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  7
+MPASM  5.51                   P2_RECEIVER.ASM   2-12-2014  5:25:39         PAGE  8
 
 
 SYMBOL TABLE
@@ -393,7 +430,7 @@ _PWRTE_ON                         00003FF7
 _WDTE_OFF                         00003FFB
 _WDTE_ON                          00003FFF
 _WDT_OFF                          00003FFB
-MPASM  5.51                   P2_RECEIVER.ASM   2-8-2014  22:59:13         PAGE  8
+MPASM  5.51                   P2_RECEIVER.ASM   2-12-2014  5:25:39         PAGE  9
 
 
 SYMBOL TABLE
@@ -402,21 +439,22 @@ SYMBOL TABLE
 _WDT_ON                           00003FFF
 _XT_OSC                           00003FED
 __16F628                          00000001
-count1                            00000020
+bitWait                           00000053
+bitWait_loop                      00000055
 counta                            00000021
 countb                            00000022
-d_in                              00000043
-d_loop                            00000047
-del_0                             00000034
-del_1                             00000035
-del_10                            00000039
-del_100                           0000003F
-del_20                            0000003B
-del_250                           00000041
-del_5                             00000037
-del_50                            0000003D
-delay                             00000042
-display                           0000002B
+delayReg                          00000020
+fourPlus                          0000002D
+initWait                          0000004D
+initWait_loop                     0000004F
+isFive                            00000044
+isFour                            00000041
+isOne                             00000038
+isSeven                           0000004A
+isSix                             00000047
+isThree                           0000003E
+isTwo                             0000003B
+isZero                            00000035
 led_0                             00000023
 led_1                             00000024
 led_2                             00000025
@@ -425,23 +463,35 @@ led_4                             00000027
 led_5                             00000028
 led_6                             00000029
 led_7                             0000002A
-start                             00000018
+numBits                           0000002C
+readAll                           0000001F
+readIn                            00000058
+sentNum                           0000002B
+sixPlus                           00000032
+startPolling                      00000018
+twoPlus                           0000002A
 
 
 MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
 
 0000 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
-0040 : XXXXXXXXXXXXXX-- ---------------- ---------------- ----------------
+0040 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXX--- ---------------- ----------------
 2000 : -------X-------- ---------------- ---------------- ----------------
 
 All other memory blocks unused.
 
-Program Memory Words Used:    78
-Program Memory Words Free:  1970
+Program Memory Words Used:    93
+Program Memory Words Free:  1955
+
+
+MPASM  5.51                   P2_RECEIVER.ASM   2-12-2014  5:25:39         PAGE 10
+
+
+
 
 
 Errors   :     0
-Warnings :     2 reported,     0 suppressed
+Warnings :     1 reported,     0 suppressed
 Messages :     2 reported,     0 suppressed
 
 

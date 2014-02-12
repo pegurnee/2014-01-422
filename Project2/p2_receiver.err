@@ -1,4 +1,3 @@
 Warning[205] F:\GITREPOS\COSC422\PROJECT2\P2_RECEIVER.ASM 13 : Found directive in column 1. (cblock)
-Message[302] F:\GITREPOS\COSC422\PROJECT2\P2_RECEIVER.ASM 35 : Register in operand not in bank 0.  Ensure that bank bits are correct.
 Message[302] F:\GITREPOS\COSC422\PROJECT2\P2_RECEIVER.ASM 37 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Warning[207] F:\GITREPOS\COSC422\PROJECT2\P2_RECEIVER.ASM 58 : Found label after column 1. (start)
+Message[302] F:\GITREPOS\COSC422\PROJECT2\P2_RECEIVER.ASM 39 : Register in operand not in bank 0.  Ensure that bank bits are correct.
