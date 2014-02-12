@@ -1,0 +1,39 @@
+MPLINK 4.49, Linker
+Linker Map File - Created Wed Feb 12 04:15:06 2014
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000066
+.config_2007_P2_TRANSMITTER.O       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000032      
+                            0x002007    0x002007      
+            52 out of 2182 program addresses used, program memory utilization is 2%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                 Delay_it   0x00002e    program     static F:\GitRepos\COSC422\Project2\p2_transmitter.asm
+                  Poll_it   0x000009    program     static F:\GitRepos\COSC422\Project2\p2_transmitter.asm
+                  Read_it   0x000010    program     static F:\GitRepos\COSC422\Project2\p2_transmitter.asm
+                  Send_it   0x000022    program     static F:\GitRepos\COSC422\Project2\p2_transmitter.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                  Poll_it   0x000009    program     static F:\GitRepos\COSC422\Project2\p2_transmitter.asm
+                  Read_it   0x000010    program     static F:\GitRepos\COSC422\Project2\p2_transmitter.asm
+                  Send_it   0x000022    program     static F:\GitRepos\COSC422\Project2\p2_transmitter.asm
+                 Delay_it   0x00002e    program     static F:\GitRepos\COSC422\Project2\p2_transmitter.asm
+
+
