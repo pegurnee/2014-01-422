@@ -11,7 +11,7 @@
 ;    at machine location 0x20.
 
 cblock 	0x20 			;start of general purpose registers
-		count1 			;used in delay routine
+		delayReg		;used in delay routines
 		counta 			;used in delay routine 
 		countb 			;used in delay routine
 		led_0
@@ -40,6 +40,23 @@ cblock 	0x20 			;start of general purpose registers
 	bcf		STATUS,RP0		;return to bank 0
 
 ;actual code follows here
+				movlw	b'00111111'
+				movwf	led_0
+				movlw	b'00000110'
+				movwf	led_1
+				movlw	b'01011011'
+				movwf	led_2
+				movlw	b'01001111'
+				movwf	led_3
+				movlw	b'01100110'
+				movwf	led_4
+				movlw	b'01101101'
+				movwf	led_5
+				movlw	b'01111101'
+				movwf	led_6
+				movlw	b'00000111'
+				movwf	led_7
+			
 startPolling	btfsc	PORTA, 0x02
 				goto	startPolling
 				
@@ -47,100 +64,90 @@ startPolling	btfsc	PORTA, 0x02
 				movwf	sentNum		;2us
 				movlw	0x08		;3us
 				movwf	numBits		;4us
-				call	initWait	;52us (should be 48us, call costs 2)
+				call	initWait	;156us (should be 152us, call costs 2; sets to the middle of the first bit to be read)
+				movlw	0x01		;157us
 				
-readAll			call	bitWait		;156us (should be 104, call costs 2)
-				call 	readIn		;
+readAll			call 	readIn		;
+				call	bitWait		;156us (should be 104, call costs 2)
 				decfsz	numBits, f	;
 				goto	readAll		;156us
 				
+				btfsc	sentNum, 0x02
+				goto	fourPlus
+				btfsc	sentNum, 0x01
+				goto	twoPlus
+				btfsc	sentNum, 0x00
+				goto	isOne
+				goto	isZero
 				
+twoPlus			btfsc	sentNum, 0x00
+				goto	isThree
+				goto	isTwo
 				
+fourPlus		btfsc	sentNum, 0x01
+				goto	sixPlus
+				btfsc	sentNum, 0x00
+				goto	isFive
+				goto	isFour
+
+sixPlus			btfsc	sentNum, 0x00
+				goto	isSeven
+				goto	isSix				
 				
+isZero			movf	led_0, w
+				movwf	PORTB
+				goto	startPolling
+isOne			movf	led_1, w
+				movwf	PORTB
+				goto	startPolling
+isTwo			movf	led_2, w
+				movwf	PORTB
+				goto	startPolling
+isThree			movf	led_3, w
+				movwf	PORTB
+				goto	startPolling
+isFour			movf	led_4, w
+				movwf	PORTB
+				goto	startPolling
+isFive			movf	led_5, w
+				movwf	PORTB
+				goto	startPolling
+isSix			movf	led_6, w
+				movwf	PORTB
+				goto	startPolling
+isSeven			movf	led_7, w
+				movwf	PORTB
+				goto	startPolling
+
 				
-			movlw	b'00111111'
-			movwf	led_0
-			movlw	b'00000110'
-			movwf	led_1
-			movlw	b'01011011'
-			movwf	led_2
-			movlw	b'01001111'
-			movwf	led_3
-			movlw	b'01100110'
-			movwf	led_4
-			movlw	b'01101101'
-			movwf	led_5
-			movlw	b'01111101'
-			movwf	led_6
-			movlw	b'00000111'
-			movwf	led_7
-	
-	start	movf	led_0, w
-			call	display
-			movf	led_1, w
-			call	display
-			movf	led_2, w
-			call	display
-			movf	led_3, w
-			call	display
-			movf	led_4, w
-			call	display
-			movf	led_5, w
-			call	display
-			movf	led_6, w
-			call	display
-			movf	led_7, w
-			call	display
-			movlw	0x00
-			call	display
-			goto	start
+;Subroutine: initWait
+;
+;Precondition: 
+;Postcondition: 
+initDelay		movlw	0x31
+				movwf	delayReg
+initDelay_loop	decfsz	delayReg, f
+				goto	initDelay_loop
 				
-;Subroutine: display
-;Displays a digit on a seven-segment display
-;Precondition: the hexcode for a 7-segment display digit is in the 'w' register
-;Postcondition: the digit is displayed on the 7-segment display, and ~250 milliseconds pass
-display	movwf	PORTB
-		call	del_250
-		call	del_250
-		call	del_250
-		call	del_250
-		clrf	PORTB
-		bcf		STATUS,RP0
-		call	del_10
+				return
+
+;Subroutine: bitWait
+;
+;Precondition: 
+;Postcondition: 
+bitWait
+
 		return
 		
-;Subroutine: delay
-;Delays for a span of time - taken directly from http://www.emunix.emich.edu/~sverdlik/COSC422/PICDelay.html
-;Made a few adjustments for style
-;Precondition: nothing specific
-;Postcondition: the program delays for a variety of times, and 0x00 is in the 'w' register
-del_0	retlw	0x00			;delay 0ms - return immediately
-del_1	movlw	0x01			;delay 1ms
-		goto	delay
-del_5	movlw	0x05			;delay 5ms
-		goto	delay
-del_10	movlw	0x0A			;delay 10ms
-		goto	delay
-del_20	movlw	0x14			;delay 20ms
-		goto	delay
-del_50	movlw	0x32			;delay 50ms
-		goto	delay
-del_100	movlw	0x64			;delay 100ms
-		goto	delay
-del_250	movlw	0xFA			;delay 250ms
+;Subroutine: readIn
+;
+;Precondition: 
+;Postcondition: 
+readIn	btfsc	PORTA, 0x02		;158us
+		
+		
 
-delay	movwf	count1
-d_in	movlw	0xC7			;delay 1mS
-		movwf	counta
-		movlw	0x01
-		movwf	countb
-d_loop	decfsz	counta, f
-		goto	$+2
-		decfsz	countb, f
-		goto	d_loop
-		decfsz	count1	,f
-		goto	d_in
-		retlw	0x00
+		return
 
 
 ; don't forget the word 'end' (it ends the code)
