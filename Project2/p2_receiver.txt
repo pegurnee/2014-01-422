@@ -64,10 +64,9 @@ startPolling	btfsc	PORTA, 0x02
 				movwf	sentNum		;2us
 				movlw	0x08		;3us
 				movwf	numBits		;4us
-				call	initWait	;156us (should be 152us, call costs 2; sets to the middle of the first bit to be read)
-				movlw	0x01		;157us
+				call	initWait	;152us (should be 148us, sets to right before the middle of the first bit to be read)
 				
-readAll			call 	readIn		;
+readAll			call 	readIn		;159us - back at 160
 				call	bitWait		;156us (should be 104, call costs 2)
 				decfsz	numBits, f	;
 				goto	readAll		;156us
@@ -118,16 +117,16 @@ isSix			movf	led_6, w
 isSeven			movf	led_7, w
 				movwf	PORTB
 				goto	startPolling
-
 				
 ;Subroutine: initWait
 ;
 ;Precondition: 
 ;Postcondition: 
-initDelay		movlw	0x31
+initDelay		movlw	0x2F
 				movwf	delayReg
 initDelay_loop	decfsz	delayReg, f
 				goto	initDelay_loop
+				goto	$+1
 				
 				return
 
@@ -143,11 +142,12 @@ bitWait
 ;
 ;Precondition: 
 ;Postcondition: 
-readIn	btfsc	PORTA, 0x02		;158us
+readIn	rlf		sentNum, f		;154us
+		movlw	0x01			;155us		
+		btfsc	PORTA, 0x02		;156us should be exactly the middle of the message
+		addwf	sentNum, f		;157us
 		
-		
-
-		return
+		return					;158us
 
 
 ; don't forget the word 'end' (it ends the code)
