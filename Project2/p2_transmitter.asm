@@ -1,6 +1,12 @@
+;Nicole Arruda and Eddie Gurnee
+;February 17, 2014
+;Microprocessors
+;Program 2: 7-digit LED
+;
 ;p2_transmitter.asm
-;Depending on the number of high power wires attached, sends data to the p2_receiver chip
-;@author: Nicole and Eddie
+;
+;Read a three-bit number represented as powered lines input to the chip.
+;This program is burned to Nicole's chip, the transmitter.
 
 ; uncomment following two lines if using 16f627 or 16f628.
 	LIST	p=16F628		;tell assembler what chip we are using
