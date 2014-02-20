@@ -1,0 +1,7 @@
+Project Ideas
+- 2 Robots seeking their mate
+- Painting program
+- Checkers (tactics) on the 64 LED board
+- Breathalyzer to the robot controller
+- Robot afraid of zappers
+- Cooperative autonomous security (proximity and IR)
