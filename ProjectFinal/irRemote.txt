@@ -51,6 +51,10 @@ main
 ;<subroutine label>
 ;			return
 
+;interrupt data
+isr
+
+retfie
 
 ; don't forget the word 'end' (it ends the code)
 	end
