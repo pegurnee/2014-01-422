@@ -175,7 +175,6 @@ isr			bcf		INTCON,INTF
 			goto	endIsr
 			
 nowTurnLeft	call	turnLeft
-			call	turnLeft
 
 endIsr		incf	didTurnRight, f			
 			retfie
