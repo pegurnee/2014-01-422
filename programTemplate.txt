@@ -15,23 +15,33 @@ cblock 	0x20 			;start of general purpose registers
 		var2 			;var2 is symbolic name for location 0x21 - <use>
 	endc
 
+	org 0x00
+		goto	main
+		
+	org 0x04
+		goto	isr
+		
+main
 ;the following lines turn off the comparators
-	movlw	0x07
-	movwf	CMCON		;turn comparators off (make it like a 16F84)
+			movlw	0x07
+			movwf	CMCON		;turn comparators off (make it like a 16F84)
+	
+;enabled interrupts on B0
+			bsf		INTCON, GIE		;enable interrupts
+			bsf		INTCON,INTE		;B0 is the interrupt line
 	
 ;We must change memory banks to set the TRIS registers
+			bsf		STATUS,RP0
+			bsf		0x81, INTEDG		;rising edge interrupts
+			movlw	0x00
+			movwf	TRISB			;PORTB is output
+			movlw	0xff
+			movwf	TRISA			;PORTA is input
+			bcf		STATUS,RP0		;return to bank 0
 
-	bsf		STATUS,RP0
-	movlw	0x00
-	movwf	TRISB			;PORTB is output
-	movlw	0xff
-	movwf	TRISA			;PORTA is input
-	bcf		STATUS,RP0		;return to bank 0
+;actual code for the program follows here
 
-;actual code follows here
-	
-	
-				
+
 ;Subroutine: <name>
 ;<subroutine summary>
 ;Precondition: <requirements for the subroutine to execute correctly>
@@ -39,6 +49,12 @@ cblock 	0x20 			;start of general purpose registers
 ;<subroutine label>
 ;			return
 
+;all of the interrupt data follows here
+isr
+			bcf		INTCON,INTF
+
+
+			retfie
 
 ; don't forget the word 'end' (it ends the code)
 	end
