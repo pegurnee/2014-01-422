@@ -33,10 +33,10 @@ main
 ;We must change memory banks to set the TRIS registers
 			bsf		STATUS,RP0
 			bsf		0x81, INTEDG		;rising edge interrupts
-			movlw	0x00
-			movwf	TRISB			;PORTB is output
-			movlw	0xff
-			movwf	TRISA			;PORTA is input
+			movlw	b'00000001'
+			movwf	TRISB			;PORTB is output, with RB0 as input (for the interrupt for later)
+			movlw	b'00000110'
+			movwf	TRISA			;PORTA is input, with RA1 and RA2 for output for the servos
 			bcf		STATUS,RP0		;return to bank 0
 
 ;actual code for the program follows here
