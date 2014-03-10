@@ -24,37 +24,31 @@ cblock 	0x20 			;start of general purpose registers
 main
 
 ;the following lines turn off the comparators
-		movlw	0x07
-		movwf	CMCON			;turn comparators off (make it like a 16F84)
+			movlw	0x07
+			movwf	CMCON			;turn comparators off (make it like a 16F84)
 		
 ;enabled interrupts on B0
-		bsf		INTCON, GIE		;enable interrupts
-		bsf		INTCON,INTE		;B0 is the interrupt line
+			bsf		INTCON, GIE		;enable interrupts
+			bsf		INTCON,INTE		;B0 is the interrupt line
 	
 ;We must change memory banks to set the TRIS registers
-
-
-		bsf		STATUS,RP0
-		movlw	b'00000001'
-		movwf	TRISB			;PORTB is output, with RB0 as input (for the interrupt for later)
-		movlw	b'00000110'
-		movwf	TRISA			;PORTA is input, with RA1 and RA2 for output for the servos
-		bcf		STATUS,RP0		;return to bank 0
+			bsf		STATUS,RP0
+			movlw	b'00000001'
+			movwf	TRISB			;PORTB is output, with RB0 as input (for the interrupt for later)
+			movlw	b'00000110'
+			movwf	TRISA			;PORTA is input, with RA1 and RA2 for output for the servos
+			bcf		STATUS,RP0		;return to bank 0
 
 ;actual code follows here
+driveLoop	call	goForward
+			goto	driveLoop
 
 
-;Subroutine: <name>
-;<subroutine summary>
-;Precondition: <requirements for the subroutine to execute correctly>
-;Postcondition: <results after correct subroutine execution>
-;<subroutine label>
-;			return
 
-
+			
 ;all the interrupts
 isr
 
-retfie
+			retfie
 ; don't forget the word 'end' (it ends the code)
 	end
