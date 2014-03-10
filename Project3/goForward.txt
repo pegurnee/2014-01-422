@@ -18,12 +18,18 @@ cblock 	0x20 			;start of general purpose registers
 ;standard operation for using interrupts
 	org 0x00
 		goto	main
+	org 0x04
+		goto	isr
 
 main
 
 ;the following lines turn off the comparators
 		movlw	0x07
-		movwf	CMCON		;turn comparators off (make it like a 16F84)
+		movwf	CMCON			;turn comparators off (make it like a 16F84)
+		
+;enabled interrupts on B0
+		bsf		INTCON, GIE		;enable interrupts
+		bsf		INTCON,INTE		;B0 is the interrupt line
 	
 ;We must change memory banks to set the TRIS registers
 
@@ -36,9 +42,8 @@ main
 		bcf		STATUS,RP0		;return to bank 0
 
 ;actual code follows here
-	
-	
-				
+
+
 ;Subroutine: <name>
 ;<subroutine summary>
 ;Precondition: <requirements for the subroutine to execute correctly>
@@ -47,5 +52,9 @@ main
 ;			return
 
 
+;all the interrupts
+isr
+
+retfie
 ; don't forget the word 'end' (it ends the code)
 	end
