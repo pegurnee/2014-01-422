@@ -15,7 +15,9 @@
 cblock 	0x20 			;start of general purpose registers
 		dReg1			;dReg1 is used in the delay routines
 		dReg2 			;dReg2 is used in the delay routines
-		
+		isTurnRight		;did the last interrupt turn right?
+		backTime		;time limit to backup
+		numTurns		;used to track number of times rotated
 	endc
 
 ;standard operation for using interrupts
@@ -68,8 +70,11 @@ goForward	movlw	b'00000110'
 ;Moves the robot backward by setting the right servo to run counter-clockwise, 
 ; and the left servo to run clockwise
 ;Precondition: Left wheel servo is connected to RA2, and right wheel servo is connected to RA1
-;Postcondition: Robot moves backward
-goBackward	movlw	b'00000110'
+;Postcondition: Robot moves backward for a set amount of time
+goBackward	movlw	0x50
+			movwf	backTime
+
+backward	movlw	b'00000110'
 			movwf	PORTA			;runs both servos as high
 			call	wait1ms			;for 1ms
 			
@@ -79,13 +84,18 @@ goBackward	movlw	b'00000110'
 			bcf		PORTA, 1		;turns of the left servo
 
 			call	waiter			;waits for the rest of the required time
+			decfsz	backTime, f
+			goto	backward
+			
 			return
 
 ;Subroutine: turnRight
 ;Rotates the robot to the right ~90°
 ;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
 ;Postcondition: the robot will have turned ~90° to the right
-turnRight	movlw	b'00000110'
+turnRight	movlw	0x20			;x20 times is close enough to 90° for me
+			movwf	numTurns
+rightStart	movlw	b'00000110'
 			movwf	PORTA
 			call 	wait1ms
 			call	wait1ms			;waits for 2ms (forward full speed for both)
@@ -94,14 +104,18 @@ turnRight	movlw	b'00000110'
 			movwf	PORTA
 
 			call	waiter
-
+			decfsz	numTurns, f
+			goto	rightStart
+			
 			return
 			
 ;Subroutine: turnLeft
 ;Rotates the robot to the left ~90°
 ;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
 ;Postcondition: the robot will have turned ~90° to the left
-turnRight	movlw	b'00000110'
+turnleft	movlw	0x20			;x20 times is close enough to 90° for me
+			movwf	numTurns
+leftStart	movlw	b'00000110'
 			movwf	PORTA
 			call	wait1ms			;waits for 1ms (reverse full speed for both)
 
@@ -110,6 +124,8 @@ turnRight	movlw	b'00000110'
 
 			call 	wait1ms			;waits for 1ms to keep the time between turing right and left the same
 			call	waiter
+			decfsz	numTurns, f
+			goto	leftStart
 
 			return
 
