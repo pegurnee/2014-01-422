@@ -63,6 +63,23 @@ turnRight	movlw	b'00000110'
 			call	waiter
 
 			return
+			
+;Subroutine: turnLeft
+;Rotates the robot to the left ~90°
+;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
+;Postcondition: the robot will have turned ~90° to the left
+turnRight	movlw	b'00000110'
+			movwf	PORTA
+			call	wait1ms			;waits for 1ms (reverse full speed for both)
+
+			movlw	0x00
+			movwf	PORTA
+
+			call 	wait1ms			;waits for 1ms to keep the time between turing right and left the same
+			call	waiter
+
+			return
+
 
 ;Subroutine: waiter
 ;Pauses for 19500 µs, allowing the dude to move correctly
