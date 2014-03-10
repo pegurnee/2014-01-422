@@ -1,5 +1,5 @@
 ;practiceTurning.txt
-;The robot turns right ~90°, turns left ~90°, turns right ~180°, turns left ~180°
+;The robot turns right ~90°, turns left ~90°, turns right ~180°, turns left ~180°, then repeats
 ;@author: Eddie Gurnee
 ;@version: 3/09/2014
 ; uncomment following two lines if using 16f627 or 16f628.
@@ -40,7 +40,13 @@ main
 			bcf		STATUS,RP0		;return to bank 0
 
 ;actual code for the program follows here
-
+turnLoop	call	turnRight
+			call	turnLeft
+			call	turnRight
+			call	turnRight
+			call	turnLeft
+			call	turnLeft
+			goto	turnLoop
 
 ;Subroutine: <name>
 ;<subroutine summary>
