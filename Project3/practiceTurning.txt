@@ -13,7 +13,7 @@
 cblock 	0x20 			;start of general purpose registers
 		dReg1			;dReg1 is used in the delay routines
 		dReg2 			;dReg2 is used in the delay routines
-		numTurns		;used to track number of time rotated
+		numTurns		;used to track number of times rotated
 	endc
 
 	org 0x00
