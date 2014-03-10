@@ -43,6 +43,22 @@ main
 driveLoop	call	goForward
 			goto	driveLoop
 
+;Subroutine: goForward
+;Moves the robot forward by setting the right servo to run clockwise, 
+; and the left servo to run counter-clockwise
+;Precondition: Left wheel servo is connected to RA2, and right wheel servo is connected to RA1
+;Postcondition: Robot moves forward
+goForward	movlw	b'00000110'
+			movwf	PORTA			;runs both servos as high
+			call	wait1ms			;for 1ms
+			
+			bcf		PORTA, 1		;turns off right servo
+			call	wait1ms			;for 1ms
+
+			bcf		PORTA, 2		;turns of the left servo
+
+			call	waiter			;waits for the rest of the required time
+			return
 
 
 			
