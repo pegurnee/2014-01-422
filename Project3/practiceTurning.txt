@@ -48,12 +48,21 @@ turnLoop	call	turnRight
 			call	turnLeft
 			goto	turnLoop
 
-;Subroutine: <name>
-;<subroutine summary>
-;Precondition: <requirements for the subroutine to execute correctly>
-;Postcondition: <results after correct subroutine execution>
-;<subroutine label>
-;			return
+;Subroutine: turnRight
+;Rotates the robot to the right ~90°
+;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
+;Postcondition: the robot will have turned ~90° to the right
+turnRight	movlw	b'00000110'
+			movwf	PORTA
+			call 	wait1ms
+			call	wait1ms			;waits for 2ms (forward full speed for both)
+
+			movlw	0x00
+			movwf	PORTA
+
+			call	waiter
+
+			return
 
 ;Subroutine: waiter
 ;Pauses for 19500 µs, allowing the dude to move correctly
