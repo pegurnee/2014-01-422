@@ -33,6 +33,7 @@ main
 	
 ;We must change memory banks to set the TRIS registers
 			bsf		STATUS,RP0
+			bsf		0x81, INTEDG	;rising edge interrupts
 			movlw	b'00000001'
 			movwf	TRISB			;PORTB is output, with RB0 as input (for the interrupt for later)
 			movlw	b'00000110'
