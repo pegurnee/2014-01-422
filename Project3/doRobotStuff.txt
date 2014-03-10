@@ -15,7 +15,7 @@
 cblock 	0x20 						;start of general purpose registers
 		dReg1						;dReg1 is used in the delay routines
 		dReg2 						;dReg2 is used in the delay routines
-		isTurnRight					;did the last interrupt turn right?
+		didTurnRight				;did the last interrupt turn right? (odd turned right)
 		backTime					;time limit to backup
 		numTurns					;used to track number of times rotated
 	endc
@@ -168,8 +168,16 @@ wait1ms_in	decfsz	dReg1, f
 ;all the interrupts
 isr			bcf		INTCON,INTF
 			call	goBackward
+			btfss	didTurnRight, 0
+			goto	nowTurnLeft
 			
+			call	turnRight
+			goto	endIsr
+			
+nowTurnLeft	call	turnLeft
+			call	turnLeft
 
+endIsr		incf	didTurnRight, f			
 			retfie
 ; don't forget the word 'end' (it ends the code)
 	end
