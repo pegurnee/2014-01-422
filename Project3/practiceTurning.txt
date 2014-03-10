@@ -55,6 +55,42 @@ turnLoop	call	turnRight
 ;<subroutine label>
 ;			return
 
+;Subroutine: waiter
+;Pauses for 19500 µs, allowing the dude to move correctly
+;Precondition: There exists registers to hold data for the delays
+;Postcondition: 19500 instruction cycles have passed
+waiter 		movlw	0x3A	;19493 cycles
+			movwf	dReg1
+			movlw	0x10
+			movwf	dReg2
+waiter_in	decfsz	dReg1, f
+			goto	$+2
+			decfsz	dReg2, f
+			goto	waiter_loop
+			
+			goto	$+1		;3 cycles
+			nop
+			
+			return			;4 cycles (including call)
+			
+;Subroutine: wait1ms
+;Pauses for 1ms, allowing the dude to move correctly
+;Precondition: There exists registers to hold data for the delays
+;Postcondition: 1ms has passed	
+wait1ms		movlw	0xC6	;993 cycles
+			movwf	dReg1
+			movlw	0x01
+			movwf	dReg2
+wait1ms_in	decfsz	dReg1, f
+			goto	$+2
+			decfsz	dReg2, f
+			goto	wait1ms_in
+			
+			goto	$+1		;3 cycles
+			nop
+			
+			return			;4 cycles (including call)
+			
 ;all of the interrupt data follows here
 isr
 			bcf		INTCON,INTF
