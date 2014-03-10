@@ -78,6 +78,24 @@ waiter_in	decfsz	dReg1, f
 			
 			return			;4 cycles (including call)
 			
+;Subroutine: wait1ms
+;Pauses for 1ms, allowing the dude to move correctly
+;Precondition: There exists registers to hold data for the delays
+;Postcondition: 1ms has passed	
+wait1ms		movlw	0xC6	;993 cycles
+			movwf	dReg1
+			movlw	0x01
+			movwf	dReg2
+wait1ms_in	decfsz	dReg1, f
+			goto	$+2
+			decfsz	dReg2, f
+			goto	wait1ms_in
+			
+			goto	$+1		;3 cycles
+			nop
+			
+			return			;4 cycles (including call)
+			
 ;all the interrupts
 isr
 
