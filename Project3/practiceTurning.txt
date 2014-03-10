@@ -11,8 +11,8 @@
 ;    at machine location 0x20.
 
 cblock 	0x20 			;start of general purpose registers
-		var1			;var1 is symbolic name for location 0x20 - <use>
-		var2 			;var2 is symbolic name for location 0x21 - <use>
+		dReg1			;dReg1 is used in the delay routines
+		dReg2 			;dReg2 is used in the delay routines
 	endc
 
 	org 0x00
