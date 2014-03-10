@@ -11,8 +11,8 @@
 ;    at machine location 0x20.
 
 cblock 	0x20 			;start of general purpose registers
-		var1			;var1 is symbolic name for location 0x20 - <use>
-		var2 			;var2 is symbolic name for location 0x21 - <use>
+		dReg1			;dReg1 is used in the delay routines
+		dReg2 			;dReg2 is used in the delay routines
 	endc
 
 ;standard operation for using interrupts
@@ -60,7 +60,23 @@ goForward	movlw	b'00000110'
 			call	waiter			;waits for the rest of the required time
 			return
 
-
+;Subroutine: waiter
+;Pauses for 19500 µs, allowing the dude to move correctly
+;Precondition: There exists registers to hold data for the delays
+;Postcondition: 19500 instruction cycles have passed
+waiter 		movlw	0x3A	;19493 cycles
+			movwf	dReg1
+			movlw	0x10
+			movwf	dReg2
+waiter_in	decfsz	dReg1, f
+			goto	$+2
+			decfsz	dReg2, f
+			goto	waiter_loop
+			
+			goto	$+1		;3 cycles
+			nop
+			
+			return			;4 cycles (including call)
 			
 ;all the interrupts
 isr
