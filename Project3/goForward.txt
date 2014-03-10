@@ -1,4 +1,4 @@
-;moveForward.txt
+;goForward.txt
 ;Moves my robot forward
 ;@author: Eddie Gurnee
 ;@version: 3/09/2014
