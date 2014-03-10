@@ -51,7 +51,7 @@ main
 ;<subroutine label>
 ;			return
 
-;interrupt data
+;all the interrupt data
 isr
 
 retfie
