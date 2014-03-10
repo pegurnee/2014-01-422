@@ -1,0 +1,50 @@
+MPLINK 4.49, Linker
+Linker Map File - Created Mon Mar 10 05:13:01 2014
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000000
+                   .org_1       code   0x000000    program   0x000002
+                   .org_2       code   0x000004    program   0x00005c
+ .config_2007_GOFORWARD.O       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000000      
+                            0x000004    0x000031      
+                            0x002007    0x002007      
+            48 out of 2182 program addresses used, program memory utilization is 2%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                driveLoop   0x000010    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+                goForward   0x000012    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+                      isr   0x000030    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+                     main   0x000005    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+                  wait1ms   0x000025    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+               wait1ms_in   0x000029    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+                   waiter   0x00001a    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+                waiter_in   0x00001e    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                     main   0x000005    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+                driveLoop   0x000010    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+                goForward   0x000012    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+                   waiter   0x00001a    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+                waiter_in   0x00001e    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+                  wait1ms   0x000025    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+               wait1ms_in   0x000029    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+                      isr   0x000030    program     static F:\GitRepos\COSC422\Project3\goForward.asm
+
+

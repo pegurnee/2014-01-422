@@ -1,0 +1,514 @@
+MPASM  5.51                  DOROBOTSTUFF.ASM   3-10-2014  5:12:27         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ;doRobotStuff.txt
+                      00002 ;Moves my robot forward, until it's whiskers move, then reverse, turn right,
+                      00003 ; then continue going forward once it's whiskers hit something else,
+                      00004 ; turn left twice (turning all the way around), and then continue going forward
+                      00005 ;@author: Eddie Gurnee
+                      00006 ;@version: 3/09/2014
+                      00007 ; uncomment following two lines if using 16f627 or 16f628.
+                      00008         LIST    p=16F628                                ;tell assembler what chip we are using
+                      00009         include "P16F628.inc"                   ;include the defaults for the chip
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ;  MPASM PIC16F628 processor include
+                      00005 ; 
+                      00006 ;  (c) Copyright 1999-2013 Microchip Technology, All rights reserved
+                      00007 ;==========================================================================
+                      00008 
+                      00381         LIST
+2007   3D18           00010         __config 0x3D18                                 ;sets the configuration settings (oscillator typ
+                            e etc.)
+                      00011 
+                      00012 ; We are telling the assembler we want to start allocating symbolic variables starting
+                      00013 ;    at machine location 0x20.
+                      00014 
+Warning[205]: Found directive in column 1. (cblock)
+                      00015 cblock  0x20                                            ;start of general purpose registers
+  00000020            00016                 dReg1                                           ;dReg1 is used in the delay routines
+  00000021            00017                 dReg2                                           ;dReg2 is used in the delay routines
+  00000022            00018                 didTurnRight                            ;did the last interrupt turn right? (odd turned 
+                            right)
+  00000023            00019                 backTime                                        ;time limit to backup
+  00000024            00020                 numTurns                                        ;used to track number of times rotated
+                      00021         endc
+                      00022 
+                      00023 ;standard operation for using interrupts
+0000                  00024         org 0x00
+0000   2805           00025                         goto    main
+0004                  00026         org 0x04
+0004   2855           00027                         goto    isr
+                      00028 
+0005                  00029 main
+                      00030 
+                      00031 ;the following lines turn off the comparators
+0005   3007           00032                         movlw   0x07
+0006   009F           00033                         movwf   CMCON                   ;turn comparators off (make it like a 16F84)
+                      00034                 
+                      00035 ;enabled interrupts on B0
+0007   178B           00036                         bsf             INTCON, GIE             ;enable interrupts
+0008   160B           00037                         bsf             INTCON, INTE    ;B0 is the interrupt line
+                      00038         
+                      00039 ;We must change memory banks to set the TRIS registers
+0009   1683           00040                         bsf             STATUS,RP0
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+MPASM  5.51                  DOROBOTSTUFF.ASM   3-10-2014  5:12:27         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+000A   1301           00041                         bcf             0x81, INTEDG    ;falling edge interrupts
+000B   3001           00042                         movlw   b'00000001'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+000C   0086           00043                         movwf   TRISB                   ;PORTB is output, with RB0 as input (for the int
+                            errupt)
+000D   30F9           00044                         movlw   b'11111001'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+000E   0085           00045                         movwf   TRISA                   ;PORTA is input, with RA1 and RA2 for output for
+                             the servos
+000F   1283           00046                         bcf             STATUS,RP0              ;return to bank 0
+                      00047 
+                      00048 ;actual code follows here
+0010   01A2           00049                         clrf    didTurnRight
+                      00050                         
+0011   2013           00051 driveLoop       call    goForward
+0012   2811           00052                         goto    driveLoop
+                      00053 
+                      00054 ;Subroutine: goForward
+                      00055 ;Moves the robot forward by setting the right servo to run clockwise, 
+                      00056 ; and the left servo to run counter-clockwise
+                      00057 ;Precondition: Left wheel servo is connected to RA2, and right wheel servo is connected to RA1
+                      00058 ;Postcondition: Robot moves forward
+0013   3006           00059 goForward       movlw   b'00000110'
+0014   0085           00060                         movwf   PORTA                   ;runs both servos as high
+0015   204A           00061                         call    wait1ms                 ;for 1ms
+                      00062                         
+0016   1085           00063                         bcf             PORTA, 1                ;turns off right servo
+0017   204A           00064                         call    wait1ms                 ;for 1ms
+                      00065 
+0018   1105           00066                         bcf             PORTA, 2                ;turns of the left servo
+                      00067 
+0019   203F           00068                         call    waiter                  ;waits for the rest of the required time
+001A   0008           00069                         return
+                      00070 
+                      00071 ;Subroutine: goBackward
+                      00072 ;Moves the robot backward by setting the right servo to run counter-clockwise, 
+                      00073 ; and the left servo to run clockwise
+                      00074 ;Precondition: Left wheel servo is connected to RA2, and right wheel servo is connected to RA1
+                      00075 ;Postcondition: Robot moves backward for a set amount of time
+001B   3050           00076 goBackward      movlw   0x50
+001C   00A3           00077                         movwf   backTime
+                      00078 
+001D   3006           00079 backward        movlw   b'00000110'
+001E   0085           00080                         movwf   PORTA                   ;runs both servos as high
+001F   204A           00081                         call    wait1ms                 ;for 1ms
+                      00082                         
+0020   1105           00083                         bcf             PORTA, 2                ;turns off right servo
+0021   204A           00084                         call    wait1ms                 ;for 1ms
+                      00085 
+0022   1085           00086                         bcf             PORTA, 1                ;turns of the left servo
+                      00087 
+0023   203F           00088                         call    waiter                  ;waits for the rest of the required time
+0024   0BA3           00089                         decfsz  backTime, f
+MPASM  5.51                  DOROBOTSTUFF.ASM   3-10-2014  5:12:27         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0025   281D           00090                         goto    backward
+                      00091                         
+0026   0008           00092                         return
+                      00093 
+                      00094 ;Subroutine: turnRight
+                      00095 ;Rotates the robot to the right ~90°
+                      00096 ;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
+                      00097 ;Postcondition: the robot will have turned ~90° to the right
+0027   3020           00098 turnRight       movlw   0x20                    ;x20 times is close enough to 90° for me
+0028   00A4           00099                         movwf   numTurns
+0029   3006           00100 rightStart      movlw   b'00000110'
+002A   0085           00101                         movwf   PORTA
+002B   204A           00102                         call    wait1ms
+002C   204A           00103                         call    wait1ms                 ;waits for 2ms (forward full speed for both)
+                      00104 
+002D   3000           00105                         movlw   0x00
+002E   0085           00106                         movwf   PORTA
+                      00107 
+002F   203F           00108                         call    waiter
+0030   0BA4           00109                         decfsz  numTurns, f
+0031   2829           00110                         goto    rightStart
+                      00111                         
+0032   0008           00112                         return
+                      00113                         
+                      00114 ;Subroutine: turnLeft
+                      00115 ;Rotates the robot to the left ~90°
+                      00116 ;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
+                      00117 ;Postcondition: the robot will have turned ~90° to the left
+0033   3020           00118 turnLeft        movlw   0x20                    ;x20 times is close enough to 90° for me
+0034   00A4           00119                         movwf   numTurns
+0035   3006           00120 leftStart       movlw   b'00000110'
+0036   0085           00121                         movwf   PORTA
+0037   204A           00122                         call    wait1ms                 ;waits for 1ms (reverse full speed for both)
+                      00123 
+0038   3000           00124                         movlw   0x00
+0039   0085           00125                         movwf   PORTA
+                      00126 
+003A   204A           00127                         call    wait1ms                 ;waits for 1ms to keep the time between turning 
+                            right and left the same
+003B   203F           00128                         call    waiter
+003C   0BA4           00129                         decfsz  numTurns, f
+003D   2835           00130                         goto    leftStart
+                      00131 
+003E   0008           00132                         return
+                      00133 
+                      00134 ;Subroutine: waiter
+                      00135 ;Pauses for 19500 µs, allowing the dude to move correctly
+                      00136 ;Precondition: There exists registers to hold data for the delays
+                      00137 ;Postcondition: 19500 instruction cycles have passed
+003F   303A           00138 waiter          movlw   0x3A                    ;19493 cycles
+0040   00A0           00139                         movwf   dReg1
+0041   3010           00140                         movlw   0x10
+0042   00A1           00141                         movwf   dReg2
+MPASM  5.51                  DOROBOTSTUFF.ASM   3-10-2014  5:12:27         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0043   0BA0           00142 waiter_in       decfsz  dReg1, f
+0044   2846           00143                         goto    $+2
+0045   0BA1           00144                         decfsz  dReg2, f
+0046   2843           00145                         goto    waiter_in
+                      00146                         
+0047   2848           00147                         goto    $+1                             ;3 cycles
+0048   0000           00148                         nop
+                      00149                         
+0049   0008           00150                         return                                  ;4 cycles (including call)
+                      00151                         
+                      00152 ;Subroutine: wait1ms
+                      00153 ;Pauses for 1ms, allowing the dude to move correctly
+                      00154 ;Precondition: There exists registers to hold data for the delays
+                      00155 ;Postcondition: 1ms has passed  
+004A   30C6           00156 wait1ms         movlw   0xC6                    ;993 cycles
+004B   00A0           00157                         movwf   dReg1
+004C   3001           00158                         movlw   0x01
+004D   00A1           00159                         movwf   dReg2
+004E   0BA0           00160 wait1ms_in      decfsz  dReg1, f
+004F   2851           00161                         goto    $+2
+0050   0BA1           00162                         decfsz  dReg2, f
+0051   284E           00163                         goto    wait1ms_in
+                      00164                         
+0052   2853           00165                         goto    $+1                             ;3 cycles
+0053   0000           00166                         nop
+                      00167                         
+0054   0008           00168                         return                                  ;4 cycles (including call)
+                      00169                         
+                      00170 ;all the interrupts
+0055   201B           00171 isr                     call    goBackward
+0056   1822           00172                         btfsc   didTurnRight, 0
+0057   285A           00173                         goto    nowTurnLeft
+                      00174                         
+0058   2027           00175                         call    turnRight
+0059   285B           00176                         goto    endIsr
+                      00177                         
+005A   2033           00178 nowTurnLeft     call    turnLeft
+                      00179 
+005B   0AA2           00180 endIsr          incf    didTurnRight, f
+005C   108B           00181                         bcf             INTCON,INTF             ;the reset interrupt should be at the 
+                      00182                                                                         ;end so it doesn't trip again wh
+                            ile it is 
+                      00183                                                                         ;moving                 
+005D   0009           00184                         retfie
+                      00185 ; don't forget the word 'end' (it ends the code)
+                      00186         end
+MPASM  5.51                  DOROBOTSTUFF.ASM   3-10-2014  5:12:27         PAGE  5
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ADDEN                             00000003
+ADEN                              00000003
+BRGH                              00000002
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CIS                               00000003
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000001F
+CMIE                              00000006
+CMIF                              00000006
+CREN                              00000004
+CSRC                              00000007
+DATA_CP_OFF                       00003FFF
+DATA_CP_ON                        00003EFF
+DC                                00000001
+EEADR                             0000009B
+EECON1                            0000009C
+EECON2                            0000009D
+EEDATA                            0000009A
+EEIE                              00000007
+EEIF                              00000007
+F                                 00000001
+FERR                              00000002
+FSR                               00000004
+GIE                               00000007
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+NOT_BO                            00000000
+NOT_BOD                           00000000
+NOT_BOR                           00000000
+NOT_PD                            00000003
+NOT_POR                           00000001
+MPASM  5.51                  DOROBOTSTUFF.ASM   3-10-2014  5:12:27         PAGE  6
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+NOT_RBPU                          00000007
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+OERR                              00000001
+OPTION_REG                        00000081
+OSCF                              00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PIE1                              0000008C
+PIR1                              0000000C
+PORTA                             00000005
+PORTB                             00000006
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RA6                               00000006
+RA7                               00000007
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RP0                               00000005
+RP1                               00000006
+RX9                               00000006
+RX9D                              00000000
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+STATUS                            00000003
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+MPASM  5.51                  DOROBOTSTUFF.ASM   3-10-2014  5:12:27         PAGE  7
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1OSCEN                           00000003
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISA6                            00000006
+TRISA7                            00000007
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRMT                              00000001
+TX9                               00000006
+TX9D                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+MPASM  5.51                  DOROBOTSTUFF.ASM   3-10-2014  5:12:27         PAGE  8
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+VR0                               00000000
+VR1                               00000001
+VR2                               00000002
+VR3                               00000003
+VRCON                             0000009F
+VREN                              00000007
+VROE                              00000006
+VRR                               00000005
+W                                 00000000
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_50                            00002BFF
+_CP_75                            000017FF
+_CP_ALL                           000003FF
+_CP_OFF                           00003FFF
+_DEVID1                           00002006
+_ER_OSC_CLKOUT                    00003FFF
+_ER_OSC_NOCLKOUT                  00003FFE
+_EXTCLK_OSC                       00003FEF
+_FOSC_ECIO                        00003FEF
+_FOSC_ERCLK                       00003FFF
+_FOSC_ERIO                        00003FFE
+_FOSC_HS                          00003FEE
+_FOSC_INTOSCCLK                   00003FFD
+_FOSC_INTOSCIO                    00003FFC
+_FOSC_LP                          00003FEC
+_FOSC_XT                          00003FED
+_HS_OSC                           00003FEE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_INTRC_OSC_CLKOUT                 00003FFD
+_INTRC_OSC_NOCLKOUT               00003FFC
+_LP_OSC                           00003FEC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_MCLRE_OFF                        00003FDF
+_MCLRE_ON                         00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+MPASM  5.51                  DOROBOTSTUFF.ASM   3-10-2014  5:12:27         PAGE  9
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FED
+__16F628                          00000001
+backTime                          00000023
+backward                          0000001D
+dReg1                             00000020
+dReg2                             00000021
+didTurnRight                      00000022
+driveLoop                         00000011
+endIsr                            0000005B
+goBackward                        0000001B
+goForward                         00000013
+isr                               00000055
+leftStart                         00000035
+main                              00000005
+nowTurnLeft                       0000005A
+numTurns                          00000024
+rightStart                        00000029
+turnLeft                          00000033
+turnRight                         00000027
+wait1ms                           0000004A
+wait1ms_in                        0000004E
+waiter                            0000003F
+waiter_in                         00000043
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : X---XXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0040 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXX-- ---------------- ----------------
+2000 : -------X-------- ---------------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:    91
+Program Memory Words Free:  1957
+
+
+Errors   :     0
+Warnings :     1 reported,     0 suppressed
+Messages :     3 reported,     0 suppressed
+
+

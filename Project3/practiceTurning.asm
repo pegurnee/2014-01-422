@@ -1,5 +1,5 @@
 ;practiceTurning.txt
-;The robot turns right ~90Â°, turns left ~90Â°, turns right ~180Â°, turns left ~180Â°, then repeats
+;The robot turns right ~90°, turns left ~90°, turns right ~180°, turns left ~180°, then repeats
 ;@author: Eddie Gurnee
 ;@version: 3/09/2014
 ; uncomment following two lines if using 16f627 or 16f628.
@@ -50,10 +50,10 @@ turnLoop	call	turnRight
 			goto	turnLoop
 
 ;Subroutine: turnRight
-;Rotates the robot to the right ~90Â°
+;Rotates the robot to the right ~90°
 ;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
-;Postcondition: the robot will have turned ~90Â° to the right
-turnRight	movlw	0x20			;x20 times is close enough to 90Â° for me
+;Postcondition: the robot will have turned ~90° to the right
+turnRight	movlw	0x20			;x20 times is close enough to 90° for me
 			movwf	numTurns
 rightStart	movlw	b'00000110'
 			movwf	PORTA
@@ -70,10 +70,10 @@ rightStart	movlw	b'00000110'
 			return
 			
 ;Subroutine: turnLeft
-;Rotates the robot to the left ~90Â°
+;Rotates the robot to the left ~90°
 ;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
-;Postcondition: the robot will have turned ~90Â° to the left
-turnLeft	movlw	0x20			;x20 times is close enough to 90Â° for me
+;Postcondition: the robot will have turned ~90° to the left
+turnLeft	movlw	0x20			;x20 times is close enough to 90° for me
 			movwf	numTurns
 leftStart	movlw	b'00000110'
 			movwf	PORTA
@@ -90,7 +90,7 @@ leftStart	movlw	b'00000110'
 			return
 
 ;Subroutine: waiter
-;Pauses for 19500 Âµs, allowing the dude to move correctly
+;Pauses for 19500 µs, allowing the dude to move correctly
 ;Precondition: There exists registers to hold data for the delays
 ;Postcondition: 19500 instruction cycles have passed
 waiter 		movlw	0x3A			;19493 cycles

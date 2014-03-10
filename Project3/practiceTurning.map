@@ -1,0 +1,56 @@
+MPLINK 4.49, Linker
+Linker Map File - Created Mon Mar 10 05:17:04 2014
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000000
+                   .org_1       code   0x000000    program   0x000002
+                   .org_2       code   0x000004    program   0x000086
+.config_2007_PRACTICETURNING.O       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000000      
+                            0x000004    0x000046      
+                            0x002007    0x002007      
+            69 out of 2182 program addresses used, program memory utilization is 3%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                      isr   0x000045    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                leftStart   0x000025    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                     main   0x000005    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+               rightStart   0x000019    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                 turnLeft   0x000023    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                 turnLoop   0x000010    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                turnRight   0x000017    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                  wait1ms   0x00003a    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+               wait1ms_in   0x00003e    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                   waiter   0x00002f    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                waiter_in   0x000033    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                     main   0x000005    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                 turnLoop   0x000010    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                turnRight   0x000017    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+               rightStart   0x000019    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                 turnLeft   0x000023    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                leftStart   0x000025    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                   waiter   0x00002f    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                waiter_in   0x000033    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                  wait1ms   0x00003a    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+               wait1ms_in   0x00003e    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+                      isr   0x000045    program     static F:\GitRepos\COSC422\Project3\practiceTurning.asm
+
+

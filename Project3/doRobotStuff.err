@@ -1,0 +1,4 @@
+Warning[205] F:\GITREPOS\COSC422\PROJECT3\DOROBOTSTUFF.ASM 15 : Found directive in column 1. (cblock)
+Message[302] F:\GITREPOS\COSC422\PROJECT3\DOROBOTSTUFF.ASM 41 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] F:\GITREPOS\COSC422\PROJECT3\DOROBOTSTUFF.ASM 43 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] F:\GITREPOS\COSC422\PROJECT3\DOROBOTSTUFF.ASM 45 : Register in operand not in bank 0.  Ensure that bank bits are correct.

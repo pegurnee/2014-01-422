@@ -1,5 +1,5 @@
-;practiceTurning.txt
-;The robot turns right ~90°, turns left ~90°, turns right ~180°, turns left ~180°, then repeats
+;goForwardAndBackward.txt
+;Moves my robot forward
 ;@author: Eddie Gurnee
 ;@version: 3/09/2014
 ; uncomment following two lines if using 16f627 or 16f628.
@@ -13,23 +13,24 @@
 cblock 	0x20 			;start of general purpose registers
 		dReg1			;dReg1 is used in the delay routines
 		dReg2 			;dReg2 is used in the delay routines
-		numTurns		;used to track number of times rotated
+		numMoves		;number of movement things to do
 	endc
 
+;standard operation for using interrupts
 	org 0x00
 			goto	main
-		
 	org 0x04
 			goto	isr
-		
+
 main
+
 ;the following lines turn off the comparators
 			movlw	0x07
-			movwf	CMCON		;turn comparators off (make it like a 16F84)
-	
+			movwf	CMCON			;turn comparators off (make it like a 16F84)
+		
 ;enabled interrupts on B0
 			bsf		INTCON, GIE		;enable interrupts
-			bsf		INTCON, INTE		;B0 is the interrupt line
+			bsf		INTCON, INTE	;B0 is the interrupt line
 	
 ;We must change memory banks to set the TRIS registers
 			bsf		STATUS, RP0
@@ -38,59 +39,61 @@ main
 			movwf	TRISB			;PORTB is output, with RB0 as input (for the interrupt for later)
 			movlw	b'11111001'
 			movwf	TRISA			;PORTA is input, with RA1 and RA2 for output for the servos
-			bcf		STATUS, RP0		;return to bank 0
+			bcf		STATUS,RP0		;return to bank 0
 
-;actual code for the program follows here
-turnLoop	call	turnRight
-			call	turnLeft
-			call	turnRight
-			call	turnRight
-			call	turnLeft
-			call	turnLeft
-			goto	turnLoop
-
-;Subroutine: turnRight
-;Rotates the robot to the right ~90°
-;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
-;Postcondition: the robot will have turned ~90° to the right
-turnRight	movlw	0x20			;x20 times is close enough to 90° for me
-			movwf	numTurns
-rightStart	movlw	b'00000110'
-			movwf	PORTA
-			call 	wait1ms
-			call	wait1ms			;waits for 2ms (forward full speed for both)
-
-			movlw	0x00
-			movwf	PORTA
-
-			call	waiter
-			decfsz	numTurns, f
-			goto	rightStart
+;actual code follows here
+driveLoop	movlw	0x50
+			movwf	numMoves
 			
+forward		call	goForward
+			decfsz	numMoves, f
+			goto	forward
+			
+			movlw	0x50
+			movwf	numMoves
+			
+backward	call	goBackward
+			decfsz	numMoves, f
+			goto	backward
+			
+			goto	driveLoop
+
+;Subroutine: goForward
+;Moves the robot forward by setting the right servo to run clockwise, 
+; and the left servo to run counter-clockwise
+;Precondition: Left wheel servo is connected to RA2, and right wheel servo is connected to RA1
+;Postcondition: Robot moves forward
+goForward	movlw	b'00000110'
+			movwf	PORTA			;runs both servos as high
+			call	wait1ms			;for 1ms
+			
+			bcf		PORTA, 1		;turns off right servo
+			call	wait1ms			;for 1ms
+
+			bcf		PORTA, 2		;turns of the left servo
+
+			call	waiter			;waits for the rest of the required time
 			return
+
+;Subroutine: goBackward
+;Moves the robot backward by setting the right servo to run counter-clockwise, 
+; and the left servo to run clockwise
+;Precondition: Left wheel servo is connected to RA2, and right wheel servo is connected to RA1
+;Postcondition: Robot moves backward
+goBackward	movlw	b'00000110'
+			movwf	PORTA			;runs both servos as high
+			call	wait1ms			;for 1ms
 			
-;Subroutine: turnLeft
-;Rotates the robot to the left ~90°
-;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
-;Postcondition: the robot will have turned ~90° to the left
-turnLeft	movlw	0x20			;x20 times is close enough to 90° for me
-			movwf	numTurns
-leftStart	movlw	b'00000110'
-			movwf	PORTA
-			call	wait1ms			;waits for 1ms (reverse full speed for both)
+			bcf		PORTA, 2		;turns off right servo
+			call	wait1ms			;for 1ms
 
-			movlw	0x00
-			movwf	PORTA
+			bcf		PORTA, 1		;turns of the left servo
 
-			call 	wait1ms			;waits for 1ms to keep the time between turing right and left the same
-			call	waiter
-			decfsz	numTurns, f
-			goto	leftStart
-
+			call	waiter			;waits for the rest of the required time
 			return
 
 ;Subroutine: waiter
-;Pauses for 19500 µs, allowing the dude to move correctly
+;Pauses for 19500 �s, allowing the dude to move correctly
 ;Precondition: There exists registers to hold data for the delays
 ;Postcondition: 19500 instruction cycles have passed
 waiter 		movlw	0x3A			;19493 cycles
@@ -125,10 +128,9 @@ wait1ms_in	decfsz	dReg1, f
 			
 			return					;4 cycles (including call)
 			
-;all of the interrupt data follows here
+;all the interrupts
 isr			bcf		INTCON, INTF
 
 			retfie
-
 ; don't forget the word 'end' (it ends the code)
 	end

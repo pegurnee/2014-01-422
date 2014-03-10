@@ -1,19 +1,23 @@
-;goForwardAndBackward.txt
-;Moves my robot forward
+;doRobotStuff.txt
+;Moves my robot forward, until it's whiskers move, then reverse, turn right,
+; then continue going forward once it's whiskers hit something else,
+; turn left twice (turning all the way around), and then continue going forward
 ;@author: Eddie Gurnee
 ;@version: 3/09/2014
 ; uncomment following two lines if using 16f627 or 16f628.
-	LIST	p=16F628		;tell assembler what chip we are using
-	include "P16F628.inc"	;include the defaults for the chip
-	__config 0x3D18			;sets the configuration settings (oscillator type etc.)
+	LIST	p=16F628				;tell assembler what chip we are using
+	include "P16F628.inc"			;include the defaults for the chip
+	__config 0x3D18					;sets the configuration settings (oscillator type etc.)
 
 ; We are telling the assembler we want to start allocating symbolic variables starting
 ;    at machine location 0x20.
 
-cblock 	0x20 			;start of general purpose registers
-		dReg1			;dReg1 is used in the delay routines
-		dReg2 			;dReg2 is used in the delay routines
-		numMoves		;number of movement things to do
+cblock 	0x20 						;start of general purpose registers
+		dReg1						;dReg1 is used in the delay routines
+		dReg2 						;dReg2 is used in the delay routines
+		didTurnRight				;did the last interrupt turn right? (odd turned right)
+		backTime					;time limit to backup
+		numTurns					;used to track number of times rotated
 	endc
 
 ;standard operation for using interrupts
@@ -33,29 +37,18 @@ main
 			bsf		INTCON, INTE	;B0 is the interrupt line
 	
 ;We must change memory banks to set the TRIS registers
-			bsf		STATUS, RP0
-			bsf		0x81, INTEDG	;rising edge interrupts
+			bsf		STATUS,RP0
+			bcf		0x81, INTEDG	;falling edge interrupts
 			movlw	b'00000001'
-			movwf	TRISB			;PORTB is output, with RB0 as input (for the interrupt for later)
+			movwf	TRISB			;PORTB is output, with RB0 as input (for the interrupt)
 			movlw	b'11111001'
 			movwf	TRISA			;PORTA is input, with RA1 and RA2 for output for the servos
 			bcf		STATUS,RP0		;return to bank 0
 
 ;actual code follows here
-driveLoop	movlw	0x50
-			movwf	numMoves
+			clrf	didTurnRight
 			
-forward		call	goForward
-			decfsz	numMoves, f
-			goto	forward
-			
-			movlw	0x50
-			movwf	numMoves
-			
-backward	call	goBackward
-			decfsz	numMoves, f
-			goto	backward
-			
+driveLoop	call	goForward
 			goto	driveLoop
 
 ;Subroutine: goForward
@@ -79,8 +72,11 @@ goForward	movlw	b'00000110'
 ;Moves the robot backward by setting the right servo to run counter-clockwise, 
 ; and the left servo to run clockwise
 ;Precondition: Left wheel servo is connected to RA2, and right wheel servo is connected to RA1
-;Postcondition: Robot moves backward
-goBackward	movlw	b'00000110'
+;Postcondition: Robot moves backward for a set amount of time
+goBackward	movlw	0x50
+			movwf	backTime
+
+backward	movlw	b'00000110'
 			movwf	PORTA			;runs both servos as high
 			call	wait1ms			;for 1ms
 			
@@ -90,10 +86,53 @@ goBackward	movlw	b'00000110'
 			bcf		PORTA, 1		;turns of the left servo
 
 			call	waiter			;waits for the rest of the required time
+			decfsz	backTime, f
+			goto	backward
+			
+			return
+
+;Subroutine: turnRight
+;Rotates the robot to the right ~90°
+;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
+;Postcondition: the robot will have turned ~90° to the right
+turnRight	movlw	0x20			;x20 times is close enough to 90° for me
+			movwf	numTurns
+rightStart	movlw	b'00000110'
+			movwf	PORTA
+			call 	wait1ms
+			call	wait1ms			;waits for 2ms (forward full speed for both)
+
+			movlw	0x00
+			movwf	PORTA
+
+			call	waiter
+			decfsz	numTurns, f
+			goto	rightStart
+			
+			return
+			
+;Subroutine: turnLeft
+;Rotates the robot to the left ~90°
+;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
+;Postcondition: the robot will have turned ~90° to the left
+turnLeft	movlw	0x20			;x20 times is close enough to 90° for me
+			movwf	numTurns
+leftStart	movlw	b'00000110'
+			movwf	PORTA
+			call	wait1ms			;waits for 1ms (reverse full speed for both)
+
+			movlw	0x00
+			movwf	PORTA
+
+			call 	wait1ms			;waits for 1ms to keep the time between turning right and left the same
+			call	waiter
+			decfsz	numTurns, f
+			goto	leftStart
+
 			return
 
 ;Subroutine: waiter
-;Pauses for 19500 Âµs, allowing the dude to move correctly
+;Pauses for 19500 µs, allowing the dude to move correctly
 ;Precondition: There exists registers to hold data for the delays
 ;Postcondition: 19500 instruction cycles have passed
 waiter 		movlw	0x3A			;19493 cycles
@@ -129,8 +168,19 @@ wait1ms_in	decfsz	dReg1, f
 			return					;4 cycles (including call)
 			
 ;all the interrupts
-isr			bcf		INTCON, INTF
+isr			call	goBackward
+			btfsc	didTurnRight, 0
+			goto	nowTurnLeft
+			
+			call	turnRight
+			goto	endIsr
+			
+nowTurnLeft	call	turnLeft
 
+endIsr		incf	didTurnRight, f
+			bcf		INTCON,INTF		;the reset interrupt should be at the 
+									;end so it doesn't trip again while it is 
+									;moving			
 			retfie
 ; don't forget the word 'end' (it ends the code)
 	end

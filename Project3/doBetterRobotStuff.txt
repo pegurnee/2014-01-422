@@ -22,9 +22,9 @@ cblock 	0x20 						;start of general purpose registers
 
 ;standard operation for using interrupts
 	org 0x00
-		goto	main
+			goto	main
 	org 0x04
-		goto	isr
+			goto	isr
 
 main
 
@@ -41,7 +41,7 @@ main
 			bsf		0x81, INTEDG	;rising edge interrupts
 			movlw	b'00000001'
 			movwf	TRISB			;PORTB is output, with RB0 as input (for the interrupt for later)
-			movlw	b'00000110'
+			movlw	b'11111001'
 			movwf	TRISA			;PORTA is input, with RA1 and RA2 for output for the servos
 			bcf		STATUS,RP0		;return to bank 0
 

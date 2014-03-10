@@ -62,7 +62,7 @@ goForward	movlw	b'00000110'
 			return
 
 ;Subroutine: waiter
-;Pauses for 19500 Âµs, allowing the dude to move correctly
+;Pauses for 19500 µs, allowing the dude to move correctly
 ;Precondition: There exists registers to hold data for the delays
 ;Postcondition: 19500 instruction cycles have passed
 waiter 		movlw	0x3A	;19493 cycles

@@ -22,9 +22,9 @@ cblock 	0x20 						;start of general purpose registers
 
 ;standard operation for using interrupts
 	org 0x00
-		goto	main
+			goto	main
 	org 0x04
-		goto	isr
+			goto	isr
 
 main
 
@@ -34,18 +34,20 @@ main
 		
 ;enabled interrupts on B0
 			bsf		INTCON, GIE		;enable interrupts
-			bsf		INTCON,INTE		;B0 is the interrupt line
+			bsf		INTCON, INTE	;B0 is the interrupt line
 	
 ;We must change memory banks to set the TRIS registers
 			bsf		STATUS,RP0
-			bsf		0x81, INTEDG	;rising edge interrupts
+			bcf		0x81, INTEDG	;falling edge interrupts
 			movlw	b'00000001'
-			movwf	TRISB			;PORTB is output, with RB0 as input (for the interrupt for later)
-			movlw	b'00000110'
+			movwf	TRISB			;PORTB is output, with RB0 as input (for the interrupt)
+			movlw	b'11111001'
 			movwf	TRISA			;PORTA is input, with RA1 and RA2 for output for the servos
 			bcf		STATUS,RP0		;return to bank 0
 
 ;actual code follows here
+			clrf	didTurnRight
+			
 driveLoop	call	goForward
 			goto	driveLoop
 
@@ -113,7 +115,7 @@ rightStart	movlw	b'00000110'
 ;Rotates the robot to the left ~90°
 ;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
 ;Postcondition: the robot will have turned ~90° to the left
-turnleft	movlw	0x20			;x20 times is close enough to 90° for me
+turnLeft	movlw	0x20			;x20 times is close enough to 90° for me
 			movwf	numTurns
 leftStart	movlw	b'00000110'
 			movwf	PORTA
@@ -122,7 +124,7 @@ leftStart	movlw	b'00000110'
 			movlw	0x00
 			movwf	PORTA
 
-			call 	wait1ms			;waits for 1ms to keep the time between turing right and left the same
+			call 	wait1ms			;waits for 1ms to keep the time between turning right and left the same
 			call	waiter
 			decfsz	numTurns, f
 			goto	leftStart
@@ -140,7 +142,7 @@ waiter 		movlw	0x3A			;19493 cycles
 waiter_in	decfsz	dReg1, f
 			goto	$+2
 			decfsz	dReg2, f
-			goto	waiter_loop
+			goto	waiter_in
 			
 			goto	$+1				;3 cycles
 			nop
@@ -166,9 +168,8 @@ wait1ms_in	decfsz	dReg1, f
 			return					;4 cycles (including call)
 			
 ;all the interrupts
-isr			bcf		INTCON,INTF
-			call	goBackward
-			btfss	didTurnRight, 0
+isr			call	goBackward
+			btfsc	didTurnRight, 0
 			goto	nowTurnLeft
 			
 			call	turnRight
@@ -176,7 +177,10 @@ isr			bcf		INTCON,INTF
 			
 nowTurnLeft	call	turnLeft
 
-endIsr		incf	didTurnRight, f			
+endIsr		incf	didTurnRight, f
+			bcf		INTCON,INTF		;the reset interrupt should be at the 
+									;end so it doesn't trip again while it is 
+									;moving			
 			retfie
 ; don't forget the word 'end' (it ends the code)
 	end
