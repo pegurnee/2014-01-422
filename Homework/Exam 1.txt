@@ -1,0 +1,68 @@
+Eddie Gurnee
+COSC 422 Midterm
+3/05/2014
+
+1.
+	    movlw	0x20		;initialize pointer
+        movwf	fsr			;to RAM
+next	movf	indf, f		; add indf register
+		addwf	SUM, f		; increment sum
+       	incf	fsr 		; increment pointer
+       	incf	fsr			; increment pointer again
+       	movf	indf, f		;
+       	sublw	d'28'		;
+      	btfss	STATUS, C	; all done ?
+    	goto	next		; no, clear next
+        nop             	; yes, continue
+
+2.
+		movlw	0x00	;
+		movwf	Reg2	;
+		movlw	0x00	;
+		movwf	Reg1	;initalize
+	
+loop	movf	Reg1, w
+		sublw	d'15'
+		btfsc	STATUS, C	;if it is less than 15, continue
+		goto	out
+		movf	Reg1, w	
+		addwf	Reg2, f
+		incf	Reg1, f
+		goto	loop
+out		nop
+
+4. 	
+	bsf		STATUS,RP0
+	movlw	b'00001111'		;B0-B3 input, B4-B7 output
+	movwf	TRISB			;portb
+	bcf		STATUS,RP0		;return to bank 0
+
+5. 
+	btfsc	STATUS, C		;if the carry bit is clear, skip cabosse
+	goto	CABOOSE
+	goto	CANARY
+	
+6.
+	cblock 0x20
+		delayReg						;used to hold the delay value
+	endc
+
+Label1			movlw	0x1
+Label2			call	Delay125		;2μs - 2μs (call)
+Label3			movf	Goofy, f		
+
+Delay125		movlw	0x1D			;1μs - 3μs (base 10: 29, 29 * 4 = 116)
+				movwf	delayReg		;1μs - 4μs
+				
+Delay125_loop	nop						; this loop (and the following nop) 
+				decfsz	delayReg, f		; needs to be 116 cycles
+				goto	Delay125_loop	; (4 * 29 - 1)μs - 119μs
+				nop						;1μs - 120
+				
+				nop						;1μs - 121μs
+				goto	$+1				;2μs - 123μs
+				return					;2μs - 125μs
+				
+7.
+	Switch bounces are switches that momentarily give off a charge when something 
+	is touched. They can be used as triggers on IR guns to shoot poor robots.
