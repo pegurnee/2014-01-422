@@ -1,7 +1,7 @@
 ;irRemote.txt
 ;This is a simple IR remote, sends signal.
 ;@author: Eddie Gurnee
-;@version: 3/09/2014
+;@version: 4/18/2014
 ; uncomment following two lines if using 16f627 or 16f628.
 	LIST	p=16F628		;tell assembler what chip we are using
 	include "P16F628.inc"	;include the defaults for the chip
@@ -11,8 +11,7 @@
 ;    at machine location 0x20.
 
 cblock 	0x20 			;start of general purpose registers
-		var1			;var1 is symbolic name for location 0x20 - <use>
-		var2 			;var2 is symbolic name for location 0x21 - <use>
+		isOn
 	endc
 
 	org 0x00
@@ -38,23 +37,42 @@ main
 		movwf 	TRISB 				;PORTB is output, with RB0 as input (for the interrupt)
 		movlw	0xff
 		movwf	TRISA				;PORTA is input
-		bcf		STATUS,RP0			;return to bank 0
+		bcf		STATUS, RP0			;return to bank 0
 
 ;actual code follows here
+		clrf	isOn
+here	goto	here
 
-
-
-;Subroutine: <name>
-;<subroutine summary>
+;Subroutine: turnOn
+;Turns on pin7 of PORTB
 ;Precondition: <requirements for the subroutine to execute correctly>
 ;Postcondition: <results after correct subroutine execution>
-;<subroutine label>
-;			return
+turnOn		movlw	b'10000000'
+			movwf	PORTB
+			bsf		isOn, 0
+			return
+
+;Subroutine: turnOff
+;Turns off pin7 of PORTB
+;Precondition: <requirements for the subroutine to execute correctly>
+;Postcondition: <results after correct subroutine execution>
+turnOff		movlw	b'00000000'
+			movwf	PORTB
+			bcf		isOn, 0
+			return
 
 ;all the interrupt data
-isr
+isr			btfss	isOn, 0
+			goto	shouldBeOn
+			
+			call	turnOff
+			goto	endIsr
+			
+shouldBeOn	call	turnOn
 
-retfie
+endIsr		bcf		INTCON, INTF
+
+			retfie
 
 ; don't forget the word 'end' (it ends the code)
 	end
