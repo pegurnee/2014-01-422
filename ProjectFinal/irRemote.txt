@@ -47,18 +47,14 @@ here	goto	here
 ;Turns on pin7 of PORTB
 ;Precondition: <requirements for the subroutine to execute correctly>
 ;Postcondition: <results after correct subroutine execution>
-turnOn		movlw	b'10000000'
-			movwf	PORTB
-			bsf		isOn, 0
+turnOn		bsf		PORTB, 7
 			return
 
 ;Subroutine: turnOff
 ;Turns off pin7 of PORTB
 ;Precondition: <requirements for the subroutine to execute correctly>
 ;Postcondition: <results after correct subroutine execution>
-turnOff		movlw	b'00000000'
-			movwf	PORTB
-			bcf		isOn, 0
+turnOff		bcf		PORTB, 7
 			return
 
 ;all the interrupt data
@@ -70,7 +66,8 @@ isr			btfss	isOn, 0
 			
 shouldBeOn	call	turnOn
 
-endIsr		bcf		INTCON, INTF
+endIsr		incf	isOn, f
+			bcf		INTCON, INTF
 
 			retfie
 
