@@ -26,22 +26,23 @@ main
 		movwf	CMCON				;turn comparators off (make it like a 16F84)
 
 ;get ready for interrupts
-		bsf		INTCON, GIE			;enable interrupts
-		bsf		INTCON, INTE		;B0 is the interrupt line
+		;bsf		INTCON, GIE			;enable interrupts
+		;bsf		INTCON, INTE		;B0 is the interrupt line
 	
 ;We must change memory banks to set the TRIS registers
 
 		bsf		STATUS, RP0
-		bsf		0x81, INTEDG		;rising edge interrupts
+		;bsf		0x81, INTEDG		;rising edge interrupts
 		
 		movlw 	b'00000001'
-		movwf 	TRISB 				;PORTB is output, with RB0 as input (for the interrupt)
+		movwf 	TRISB 				;PORTB is output, with RB0 as input
 		movlw	0xff
 		movwf	TRISA				;PORTA is input
 		bcf		STATUS, RP0			;return to bank 0
 
 ;actual code follows here
 		clrf	isOn
+		
 here	
 		goto	here
 		
