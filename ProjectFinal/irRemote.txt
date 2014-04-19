@@ -33,6 +33,7 @@ main
 
 		bsf		STATUS, RP0
 		bsf		0x81, INTEDG		;rising edge interrupts
+		
 		movlw 	b'00000001'
 		movwf 	TRISB 				;PORTB is output, with RB0 as input (for the interrupt)
 		movlw	0xff
@@ -41,7 +42,13 @@ main
 
 ;actual code follows here
 		clrf	isOn
-here	goto	here
+here	
+		goto	here
+		
+;Subroutine: turnOn
+;Turns on pin7 of PORTB
+;Precondition: <requirements for the subroutine to execute correctly>
+;Postcondition: <results after correct subroutine execution>
 
 ;Subroutine: turnOn
 ;Turns on pin7 of PORTB
