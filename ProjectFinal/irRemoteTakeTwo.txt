@@ -52,9 +52,9 @@ here	btfss	PORTB, 0
 ;Turns on pin7 of PORTB
 ;Precondition: <requirements for the subroutine to execute correctly>
 ;Postcondition: <results after correct subroutine execution>
-cycle	
-		
-		return
+cycle		
+			
+			return
 
 ;Subroutine: turnOn
 ;Turns on pin7 of PORTB
