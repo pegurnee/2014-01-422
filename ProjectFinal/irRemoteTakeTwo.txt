@@ -43,16 +43,18 @@ main
 ;actual code follows here
 		clrf	isOn
 		
-here	
+here	btfss	PORTB, 0
+		goto	here
+		call	cycle
 		goto	here
 		
 ;Subroutine: cycle
 ;Turns on pin7 of PORTB
 ;Precondition: <requirements for the subroutine to execute correctly>
 ;Postcondition: <results after correct subroutine execution>
-cycle		
-
-			return
+cycle	
+		
+		return
 
 ;Subroutine: turnOn
 ;Turns on pin7 of PORTB
