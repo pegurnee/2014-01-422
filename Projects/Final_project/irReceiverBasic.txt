@@ -41,7 +41,8 @@ main
 			bcf		STATUS,RP0		;return to bank 0
 
 ;actual code for the program follows here
-
+			bsf		PORTB, 0x05
+			
 ; poll PORTA R5
 ; when RA5 goes low
 	pollR5	btfsc	PORTA, 0x05
@@ -67,7 +68,8 @@ main
 			bcf		PORTB, 0x04
 
 ; set PORTB R5 high (command line for driver)
-			bsf		PORTB, 0x05
+			bcf		PORTB, 0x05
+			
 			
 ;################# BELOW IS AS OF YET UNUSED #################	
 ; 	pulse data (3 bits) to the main chip
@@ -81,7 +83,7 @@ main
 ;################# ABOVE IS AS OF YET UNUSED #################
 
 ; set PORTB R5 low (command line for driver)
-			bcf		PORTB, 0x05
+			bsf		PORTB, 0x05
 			
 ; return to polling
 			goto	pollR5

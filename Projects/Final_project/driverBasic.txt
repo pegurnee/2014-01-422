@@ -44,7 +44,7 @@ main
 			movwf	TRISB			;PORTB is output, with RB0 as input (for the interrupt)
 			movlw	b'11111001'
 			movwf	TRISA			;PORTA is input, with RA1 and RA2 for output for the servos
-			bcf		STATUS,RP0		;return to bank 0
+			bcf		STATUS, RP0		;return to bank 0
 
 ;actual code follows here
 			clrf	didTurnRight
