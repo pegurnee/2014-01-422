@@ -54,7 +54,7 @@ main
 			bcf		PORTB, 0x03
 			
 ;################# BELOW IS AS OF YET UNUSED #################
-; 	poll the three sent bits of data (each data is separated by 50 microseconds)
+; 	poll the three sent bits of data (each data is 130 in length and separated by 50 microseconds, 90 cycle checks)
 ; 		if low pulses == 0
 ; 			do damage
 ; 		if low pulses == 1
