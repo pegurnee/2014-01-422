@@ -1,3 +1,29 @@
-; 26 microseconds
+; poll PORTA R5
+; when RA5 goes high
+;	cycle (inital go low)
+;	wait 50 microseconds
+; 	poll PORTA R2, PORTA R3, and PORTA R4
+; 		if RA2 is high
+;			cycle (go low for just damage)
+;			wait 50 microseconds
+;			wait 26 microseconds - stays high for not restart
+; 			wait 50 microseconds
+;			wait 26 microseconds - stays high for not music
+;		if RA2 is low
+;			wait 26 microseconds - stays high for not damage
+;			wait 50 microseconds
+;			if RA3 is high
+;				cycle (go low for restart)
+;				wait 50 microseconds
+;				wait 26 microseconds - stays high for unneeded bit
+;			if RA3 is low
+;				wait 26 microseconds - stays high for not restart
+;				wait 50 microseconds
+;					if RA4 is high
+;						cycle (go low for tune 1)
+;					if RA4 is low
+;						wait 26 microseconds - stays high for tune 2
+; cycle()
+; 26 microseconds long
 ; 	13 high
 ; 	13 low
