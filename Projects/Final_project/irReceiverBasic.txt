@@ -11,8 +11,8 @@
 ;    at machine location 0x20.
 
 cblock 	0x20 			;start of general purpose registers
-		var1			;var1 is symbolic name for location 0x20 - <use>
-		var2 			;var2 is symbolic name for location 0x21 - <use>
+		d1				;used for interrupt driven delay
+		d2				;used for interrupt driven delay
 	endc
 
 	org 0x00
@@ -47,7 +47,7 @@ main
 			goto	pollR5
 			
 ;	set PORTB R3 high 
-; 		(that does to an interrupt on the other receivers, making it wait for half a second)
+; 		(that does to an interrupt on the other receivers, making it wait for a millisecond)
 			bsf		PORTB, 0x03
 			bcf		PORTB, 0x03
 			
@@ -93,11 +93,27 @@ main
 ;			return
 
 ;all of the interrupt data follows here
+; on PORTB R0 interrupt
 isr
-			bcf		INTCON,INTF
+; 	delay 500 milliseconds
+			movlw	0xC7
+			movwf	d1
+			movlw	0x01
+			movwf	d2
+		
+	wait	decfsz	d1, f
+			goto	$+2
+			decfsz	d2, f
+			goto	wait	; 2 cycles
+			
+			goto	$+1
 
-
-			retfie
+			
+; 	reset interrupt flag
+			bcf		INTCON, INTF
+			
+; 	goto polling RA5 (not return from interrupt)
+			goto	pollR5
 
 ; don't forget the word 'end' (it ends the code)
 	end
