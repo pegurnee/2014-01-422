@@ -167,6 +167,28 @@ wait1ms_in	decfsz	dReg1, f
 			
 			return					;4 cycles (including call)
 			
+;Subroutine: bitDelay
+;the amount to wait between each read in bit
+;Precondition: 
+;Postcondition: 50 microseconds have passed
+bitDelay	movlw	0x0F			;46 cycles
+			movwf	dReg1
+bitDelay_in	decfsz	dReg1, f
+			goto	bitDelay_in
+			
+			return	;4 cycles (including call)
+	
+;Subroutine: readIn
+;Reads in the two three bits from the user
+;Precondition: 
+;Postcondition: 
+readIn		rlf		sentNum, f		;154us, 258us
+			movlw	0x01			;155us, 259us
+			btfsc	PORTA, 0x02		;156us should be exactly the middle of the message, 260us
+			addwf	sentNum, f		;157us, 261us
+
+			return					;159us, 263us
+		
 ;all the interrupts
 isr
 ; 	stop moving forward
@@ -179,8 +201,9 @@ isr
 				goto	isr_wall
 			
 ;	if high, read two pulses
-	isr_ir	
-	
+	isr_ir		
+
+;################# BELOW IS AS OF YET UNUSED #################
 ;		squeal in pain
 ; 		lower health
 ;		if health is at zero, power down
@@ -190,12 +213,13 @@ isr
 ;			turn right 90°
 ;		if high pulses > 1, the sender wants to turn on
 ;			turn on
-			
+;################# ABOVE IS AS OF YET UNUSED #################
 	
 ; 	if low, standard backup and rotate interrupt
 ;		on each hit
 	isr_wall
 ; back up
+				incf	didTurnRight, f
 				call	goBackward
 				
 ; on odd hits
@@ -208,9 +232,8 @@ isr
 				
 ; turn right 90°
 	nowTurnLeft	call	turnLeft
-
-	endIsr		incf	didTurnRight, f
-				bcf		INTCON, INTF	;the reset interrupt should be at the 
+	
+	endIsr		bcf		INTCON, INTF	;the reset interrupt should be at the 
 										;end so it doesn't trip again while it is 
 										;moving			
 				retfie
