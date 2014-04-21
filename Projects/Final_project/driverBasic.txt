@@ -18,6 +18,7 @@ cblock 	0x20 						;start of general purpose registers
 		didTurnRight				;did the last interrupt turn right? (odd turned right)
 		backTime					;time limit to backup
 		numTurns					;used to track number of times rotated
+		irData						;used to get info about the ir receiver
 	endc
 
 ;standard operation for using interrupts
@@ -176,18 +177,31 @@ bitDelay	movlw	0x0F			;46 cycles
 bitDelay_in	decfsz	dReg1, f
 			goto	bitDelay_in
 			
-			return	;4 cycles (including call)
-	
+			return					;4 cycles (including call)
+
+;Subroutine: initBitDelay
+;the amount to wait between each read in bit
+;Precondition: 
+;Postcondition: 25 microseconds have passed
+inBitDelay	movlw	0x06			;19 cycles
+			movwf	dReg1
+inBit_in	decfsz	dReg1, f
+			goto	inBit_in
+			
+			goto	$+1				;2 cycles
+			
+			return					;4 cycles (including call)
+			
 ;Subroutine: readIn
 ;Reads in the two three bits from the user
 ;Precondition: 
 ;Postcondition: 
-readIn		rlf		sentNum, f		;154us, 258us
-			movlw	0x01			;155us, 259us
-			btfsc	PORTA, 0x02		;156us should be exactly the middle of the message, 260us
-			addwf	sentNum, f		;157us, 261us
+readIn		rlf		irData, f
+			movlw	0x01
+			btfsc	PORTA, 0x06
+			addwf	irData, f
 
-			return					;159us, 263us
+			return
 		
 ;all the interrupts
 isr
@@ -201,7 +215,10 @@ isr
 				goto	isr_wall
 			
 ;	if high, read two pulses
-	isr_ir		
+	isr_ir		call	inBitDelay
+				call	readIn
+				call	bitDelay
+				call	readIn
 
 ;################# BELOW IS AS OF YET UNUSED #################
 ;		squeal in pain
