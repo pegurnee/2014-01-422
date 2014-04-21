@@ -1,4 +1,10 @@
 ; poll PORTA R5
-; when RA5 goes low set PORTB R3 high 
-;  (that does to an interrupt on the other receivers, making it wait for half a second)
-; set PORTB R4 high, and pulse the data of the receiver location to the main chip
+; when RA5 goes low
+;	set PORTB R3 high 
+; 		(that does to an interrupt on the other receivers, making it wait for half a second)
+; set PORTB R4 high
+; 	pulse the data of the receiver location to the main chip
+; on PORTB R0 interrupt
+; 	delay 500 milliseconds
+; 	reset interrupt flag
+; 	goto polling RA5 (not return from interrupt)
