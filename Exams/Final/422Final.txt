@@ -1,0 +1,58 @@
+Eddie Gurnee
+COSC 422 Final
+04/14/2014
+
+1.
+	In the PIC16F628 Microcontrollers' EEPROM, there are 128 bytes of data.
+	
+
+2.
+	
+	cblock 0x20
+		SUM
+		count
+		eDest
+	endc
+	
+			MOVLW	0x00
+			MOVWF	SUM, f			;sets sum to 0
+			MOVLW	0x04
+			MOVWF	eDest, f		;sets eDest to the first address to read
+			MOVLW	0x02
+			MOVWF	count, f		;sets up to count 2 times
+			
+readloop	BSF 	STATUS, RP0 	
+			MOVF 	eDest, w		;use EEPROM address that is incrementing
+			MOVWF 	EEADR			;address to read
+			BSF 	EECON1, RD 		;EE read from EEPROM memory to EEDATA reg
+			MOVF 	EEDATA, W		;W = EEDATA
+			BCF		STATUS,	RP0		;Bank 0
+	
+			ADDWF	SUM, f			;keeps the sum going
+			INCF	eDest, f		;looks at the next EEPROM address
+			DECFSZ	count, f
+			GOTO	readLoop
+			
+3.
+	The other code is an interrupt. If, while the line of code
+			BCF		INTCON, GIE
+	an interrupt is thrown, the interrupt is put onto the stack until the currently 
+	executing line of code is finished. Upon completion of clearing the global interrupt 
+	enable bit, the interrupt system call is popped from the stack, jumping into the 
+	interrupt. If, inside of the interrupt, the user reenabled the GIE, then by the time 
+	the PC returns from the interrupt and reaches the next line, interrupts have been 
+	reenabled.
+
+4.
+	The smallest prescaler value that can be used to generate an interrupt every 1/100th 
+	of a second would be 64.
+
+5.
+	Attempting to reach:		10000	µs
+	Prescaler value:		÷	   64
+	Length of each 'tick':		  156.25µs
+	
+	The value '10011100'b should be written to Timer0. With each 'tick' being 156µs long, 
+	the interrupt would be thrown after 9984µs (or 9.984ms), almost nearly 1/100th of a 
+	second.
+	

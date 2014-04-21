@@ -1,0 +1,44 @@
+"I have neither given nor received any help from any person in completing this exam."
+Edward Gurnee
+
+
+1.
+	9 bytes for full time/temp data:
+		2 bytes for temp
+		7 bytes for date and time
+			-seconds
+			-minutes
+			-hours
+			-day
+			-date
+			-month
+			-year
+
+2.
+	PIC EEPROM = 128 bytes
+	We would be able to store ~14.2222 ordered pairs of temp/times into the EEPROM.
+	
+3.
+	4 pins from the pic
+		2 pins for the thermometer (only communication, not parasite power)
+			-while the thermometer only has one control line, the PIC chip needs
+				and input and output line to communicate with it
+			-we aren't using parasite power because of its inability to be
+				used in temperatures over 100ºC, safety first
+		2 pins for the clock
+			-one for transmitting and one for receiving on the 2-wire serial bus
+	
+4.
+	Initializing all of the code would come first.
+	
+	Every thirty minutes (established by a combination of timer interrupts and our 
+		own post scaler) we would poll the thermometer and clock for data.
+		
+	That data would be stored in EEADR++ (in the current EEPROM address and then 
+		increment the EEPROM address register)
+		
+	After we reach 8 storings, we would restart the EEADR to the beginning.
+
+5.
+	Bonuses of the one wire protocol include the fact that only one pin is being used by
+		the object, instead of more than one with other protocols.
