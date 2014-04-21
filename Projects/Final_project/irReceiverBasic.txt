@@ -70,6 +70,10 @@ main
 			bcf		PORTB, 0x04
 			bsf		PORTB, 0x04
 
+; pulse data to the driver chip
+			call	goOutLow
+			call	goOutHigh
+			
 ;################# BELOW IS AS OF YET UNUSED #################	
 ; 	pulse data (3 bits) to the main chip
 ;		if first bit is low
@@ -91,14 +95,26 @@ main
 ;the amount to wait between each read in bit
 ;Precondition: 
 ;Postcondition: 50 microseconds have passed
-
-outGoLow	bcf
+outGoLow	bcf		PORTB, 0x05
 			movlw	0x0F			;46 cycles
-			movwf	dReg1
-bitDelay_in	decfsz	dReg1, f
-			goto	bitDelay_in
+			movwf	d1
+outLow_in	decfsz	d1, f
+			goto	outLow_in
 			
 			return					;4 cycles (including call)
+			
+;Subroutine: outGoHigh
+;the amount to wait between each read in bit
+;Precondition: 
+;Postcondition: 50 microseconds have passed
+outGoHigh	bsf		PORTB, 0x05
+			movlw	0x0F			;46 cycles
+			movwf	d1
+outHigh_in	decfsz	d1, f
+			goto	outHigh_in
+			
+			return					;4 cycles (including call)
+			
 ;all of the interrupt data follows here
 ; on PORTB R0 interrupt
 isr
