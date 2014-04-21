@@ -1,1 +1,8 @@
 ; move forward
+; on PORTB R0 interrupt
+; 	stop moving forward
+; 	check if PORTA R0 (input from IR receivers) is high
+;	if high, read two pulses
+;		if both high, the sender is on the right
+;		if both low, the sender is on the left
+; 
