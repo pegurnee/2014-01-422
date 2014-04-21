@@ -3,6 +3,8 @@
 ;	set PORTB R3 high 
 ; 		(that does to an interrupt on the other receivers, making it wait for half a second)
 ; 	poll the three sent bits of data (each data is separated by 50 microseconds)
+;		(to get an accurate rating, the data must be polled three 
+; 			times while it should be transmitting, take the average)
 ; 		if low pulses == 0
 ; 			do damage
 ; 		if low pulses == 1
