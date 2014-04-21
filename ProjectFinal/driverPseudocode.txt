@@ -13,6 +13,7 @@
 ;		if high pulses > 1, the sender wants to turn on
 ;			turn on
 ; 	if low, standard backup and rotate interrupt
-;		on each hit, back up
+;		on each hit
+;			back up
 ;			on odd hits, turn right 90°
 ;			on even hits, turn left 180°
