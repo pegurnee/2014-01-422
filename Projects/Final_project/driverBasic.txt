@@ -1,9 +1,9 @@
-;doRobotStuff.txt
-;Moves my robot forward, until it's whiskers move, then reverse, turn right,
-; then continue going forward once it's whiskers hit something else,
-; turn left twice (turning all the way around), and then continue going forward
-;@author: Eddie Gurnee
-;@version: 4/21/2014
+; doRobotStuff.txt
+; Moves my robot forward, until it's whiskers move, then reverse, turn right,
+; 	then continue going forward once it's whiskers hit something else,
+; 	turn left twice (turning all the way around), and then continue going forward
+; @author: Eddie Gurnee
+; @version: 4/21/2014
 ; uncomment following two lines if using 16f627 or 16f628.
 	LIST	p=16F628				;tell assembler what chip we are using
 	include "P16F628.inc"			;include the defaults for the chip
