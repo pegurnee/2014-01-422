@@ -6,4 +6,6 @@
 ;		if both pulses high, the sender is on the right
 ;		if both pulses low, the sender is on the left
 ; 	if low, standard backup and rotate interrupt
-; 		
+;		on each hit, back up
+;			on odd hits, turn right 90°
+;			on even hits, turn left 180°
