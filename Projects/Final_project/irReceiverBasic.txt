@@ -61,13 +61,13 @@ main
 ;			play music
 ;################# ABOVE IS AS OF YET UNUSED #################
 
-; set PORTB R5 high (command line for driver)
-			bsf		PORTB, 0x05
-
 ; set PORTB R4 high (interrupt pin on driver)
 			bsf		PORTB, 0x04
 			bcf		PORTB, 0x04
 
+; set PORTB R5 high (command line for driver)
+			bsf		PORTB, 0x05
+			
 ;################# BELOW IS AS OF YET UNUSED #################	
 ; 	pulse data (3 bits) to the main chip
 ;		if first bit is low
