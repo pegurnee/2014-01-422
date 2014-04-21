@@ -1,0 +1,6 @@
+; poll PORTA R5
+; when it goes low set PORTB R3 high 
+;  (that does to an interrupt on the other receivers, making it wait for half a second)
+; 
+;
+;
