@@ -3,6 +3,7 @@
 ; 	stop moving forward
 ; 	check if PORTA R0 (input from IR receivers) is high
 ;	if high, read two pulses
-;		if both high, the sender is on the right
-;		if both low, the sender is on the left
-; 
+;		if both pulses high, the sender is on the right
+;		if both pulses low, the sender is on the left
+; 	if low, standard backup and rotate interrupt
+; 		
