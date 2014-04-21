@@ -1,0 +1,127 @@
+; irTransmitterBasic.txt
+; This is a remote used to communicate with Severus
+; @author: Eddie Gurnee
+; @version: 4/21/14
+; uncomment following two lines if using 16f627 or 16f628.
+	LIST	p=16F628		;tell assembler what chip we are using
+	include "P16F628.inc"	;include the defaults for the chip
+	__config 0x3D18			;sets the configuration settings (oscillator type etc.)
+
+; We are telling the assembler we want to start allocating symbolic variables starting
+;    at machine location 0x20.
+
+cblock 	0x20 			;start of general purpose registers
+		d1				;used in delay subroutine
+		pulseCount 		;used in the cycle subroutine
+	endc
+
+	org 0x00
+		goto	main
+		
+	org 0x04
+		goto	isr
+		
+main
+;the following lines turn off the comparators
+			movlw	0x07
+			movwf	CMCON		;turn comparators off (make it like a 16F84)
+	
+;We must change memory banks to set the TRIS registers
+			bsf		STATUS, RP0
+			movlw	0x00
+			movwf	TRISB			;PORTB is output
+			movlw	0xff
+			movwf	TRISA			;PORTA is input
+			bcf		STATUS, RP0		;return to bank 0
+
+;actual code for the program follows here
+
+; poll PORTA R5
+; when RA5 goes high
+	pollR5	btfss	PORTA, 0x05
+			goto	pollR5
+			
+;	cycle (inital go low)
+			call	cycle
+;	wait 50 microseconds
+			call	irDelay
+			
+;################# BELOW IS AS OF YET UNUSED #################
+; 	poll PORTA R2, PORTA R3, and PORTA R4
+;		if RA2 is low
+;			wait 26 microseconds - stays high for not damage
+;			wait 50 microseconds
+;			if RA3 is high
+;				cycle (go low for restart)
+;				wait 50 microseconds
+;				wait 26 microseconds - stays high for unneeded bit
+;			if RA3 is low
+;				wait 26 microseconds - stays high for not restart
+;				wait 50 microseconds
+;					if RA4 is high
+;						cycle (go low for tune 1)
+;					if RA4 is low
+;						wait 26 microseconds - stays high for tune 2
+;################# ABOVE IS AS OF YET UNUSED #################
+			call	damage
+			
+			goto	pollR5
+
+
+;Subroutine: irDelay
+;delays for 50 microseconds
+;Precondition: 
+;Postcondition: 50 instruction cycles have passed
+irDelay		movlw	0x0F			;46 cycles
+			movwf	d1
+irDelay_in	decfsz	d1, f
+			goto	irDelay_in
+			
+			return					;4 cycles (including call)
+
+;Subroutine: damage
+;
+;Precondition: if RA2 is high
+;Postcondition:
+; cycle (go low for just damage)
+damage		call	cycle
+; wait 50 microseconds
+			call	irDelay
+			
+; wait 26 microseconds - stays high for not restart
+; wait 50 microseconds
+			call	cycleWait
+			call	irDelay
+			
+; wait 26 microseconds - stays high for not music
+			call	cycleWait
+			
+			return					;4 cycles (including call)
+			
+;Subroutine: cycle
+;cycle the IR 5 times at 9600 baud
+;Precondition: 
+;Postcondition: 
+cycle		movlw	0x05
+			movwf	pulseCount
+cycleCount	call	pulseDelay
+			bsf		PORTB, 0x07
+			call	pulseDelay
+			bcf		PORTB, 0x07
+			decfsz	pulseDelay, f
+			
+			return					;4 cycles (including call)		
+			
+;Subroutine: pulseDelay
+;delays for 12 microseconds
+;Precondition: 
+;Postcondition: 12 instruction cycles have passed
+pulseDelay	goto	$+1				;8 cycles
+			goto	$+1
+			goto	$+1
+			goto	$+1
+			
+			return					;4 cycles (including call)
+			
+; don't forget the word 'end' (it ends the code)
+	end
