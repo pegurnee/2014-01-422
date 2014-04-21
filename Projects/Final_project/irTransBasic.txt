@@ -109,8 +109,24 @@ cycleCount	call	pulseDelay
 			call	pulseDelay
 			bcf		PORTB, 0x07
 			decfsz	pulseDelay, f
+			goto	cycleCount
 			
 			return					;4 cycles (including call)		
+
+;Subroutine: cycleWait
+;wait for the amount of time a normal cycle would go
+;Precondition: 
+;Postcondition: 
+cycleWait	movlw	0x05
+			movwf	pulseCount
+cycleWaitC	call	pulseDelay
+			nop
+			call	pulseDelay
+			nop
+			decfsz	pulseDelay, f
+			goto	cycleWaitC
+			
+			return					;4 cycles (including call)	
 			
 ;Subroutine: pulseDelay
 ;delays for 12 microseconds
