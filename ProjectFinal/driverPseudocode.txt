@@ -3,8 +3,15 @@
 ; 	stop moving forward
 ; 	check if PORTA R0 (input from IR receivers) is high
 ;	if high, read two pulses
-;		if both pulses high, the sender is on the right
-;		if both pulses low, the sender is on the left
+;		squeal in pain
+; 		lower health
+;		if health is at zero, power down
+;		if high pulses == 0, the sender is on the right
+;			turn left 90°
+;		if high pulses == 1, the sender is on the left
+;			turn right 90°
+;		if high pulses > 1, the sender wants to turn on
+;			turn on
 ; 	if low, standard backup and rotate interrupt
 ;		on each hit, back up
 ;			on odd hits, turn right 90°
