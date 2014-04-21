@@ -1,7 +1,8 @@
-;irReceiverBasic.txt
-;connected to the IR Receiver, this chip will 
-;@author: Eddie Gurnee
-;@version: 4/21/14
+; irReceiverBasic.txt
+; connected to the IR Receiver, this chip 
+; 	will send the transmitter data onto the driver chip
+; @author: Eddie Gurnee
+; @version: 4/21/14
 ; uncomment following two lines if using 16f627 or 16f628.
 	LIST	p=16F628		;tell assembler what chip we are using
 	include "P16F628.inc"	;include the defaults for the chip
