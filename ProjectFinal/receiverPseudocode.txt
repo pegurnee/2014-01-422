@@ -2,8 +2,22 @@
 ; when RA5 goes low
 ;	set PORTB R3 high 
 ; 		(that does to an interrupt on the other receivers, making it wait for half a second)
+; 	poll the three sent bits of data (each data is separated by 50 microseconds)
+; 		if low pulses == 0
+; 			do damage
+; 		if low pulses == 1
+;			send restart
+;		if low pulses == 2
+;			play music
 ; set PORTB R4 high
-; 	pulse the data of the receiver location to the main chip
+; 	pulse data (3 bits) to the main chip
+;		if first bit is low
+;			following bits contain location of the receiver (2 bits)
+;		if first bit is high
+;			if first bit is low
+;				send restart
+; 			if first bit is high
+;				the last bit decides the song
 ; on PORTB R0 interrupt
 ; 	delay 500 milliseconds
 ; 	reset interrupt flag
