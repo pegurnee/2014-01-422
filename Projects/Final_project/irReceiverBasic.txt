@@ -41,7 +41,7 @@ main
 			bcf		STATUS,RP0		;return to bank 0
 
 ;actual code for the program follows here
-			bsf		PORTB, 0x05
+			bsf		PORTB, 0x04
 			
 ; poll PORTA R5
 ; when RA5 goes low
@@ -63,14 +63,13 @@ main
 ;			play music
 ;################# ABOVE IS AS OF YET UNUSED #################
 
-; set PORTB R4 high (interrupt pin on driver)
-			bsf		PORTB, 0x04
-			bcf		PORTB, 0x04
-
 ; set PORTB R5 high (command line for driver)
-			bcf		PORTB, 0x05
+			bsf		PORTB, 0x05
 			
-			
+; set PORTB R4 high (interrupt pin on driver)
+			bcf		PORTB, 0x04
+			bsf		PORTB, 0x04
+
 ;################# BELOW IS AS OF YET UNUSED #################	
 ; 	pulse data (3 bits) to the main chip
 ;		if first bit is low
@@ -83,18 +82,23 @@ main
 ;################# ABOVE IS AS OF YET UNUSED #################
 
 ; set PORTB R5 low (command line for driver)
-			bsf		PORTB, 0x05
+			bcf		PORTB, 0x05
 			
 ; return to polling
 			goto	pollR5
 
-;Subroutine: <name>
-;<subroutine summary>
-;Precondition: <requirements for the subroutine to execute correctly>
-;Postcondition: <results after correct subroutine execution>
-;<subroutine label>
-;			return
+;Subroutine: outGoLow
+;the amount to wait between each read in bit
+;Precondition: 
+;Postcondition: 50 microseconds have passed
 
+outGoLow	bcf
+			movlw	0x0F			;46 cycles
+			movwf	dReg1
+bitDelay_in	decfsz	dReg1, f
+			goto	bitDelay_in
+			
+			return					;4 cycles (including call)
 ;all of the interrupt data follows here
 ; on PORTB R0 interrupt
 isr
