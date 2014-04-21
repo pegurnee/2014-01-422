@@ -3,7 +3,7 @@
 ; then continue going forward once it's whiskers hit something else,
 ; turn left twice (turning all the way around), and then continue going forward
 ;@author: Eddie Gurnee
-;@version: 3/09/2014
+;@version: 4/21/2014
 ; uncomment following two lines if using 16f627 or 16f628.
 	LIST	p=16F628				;tell assembler what chip we are using
 	include "P16F628.inc"			;include the defaults for the chip
@@ -64,7 +64,7 @@ goForward	movlw	b'00000110'
 			bcf		PORTA, 1		;turns off right servo
 			call	wait1ms			;for 1ms
 
-			bcf		PORTA, 2		;turns of the left servo
+			bcf		PORTA, 2		;turns off the left servo
 
 			call	waiter			;waits for the rest of the required time
 			return
@@ -84,7 +84,7 @@ backward	movlw	b'00000110'
 			bcf		PORTA, 2		;turns off right servo
 			call	wait1ms			;for 1ms
 
-			bcf		PORTA, 1		;turns of the left servo
+			bcf		PORTA, 1		;turns off the left servo
 
 			call	waiter			;waits for the rest of the required time
 			decfsz	backTime, f
@@ -116,7 +116,7 @@ rightStart	movlw	b'00000110'
 ;Rotates the robot to the left ~180°
 ;Precondition: wait1ms and waiter subroutines exist, and the robot is connected correctly
 ;Postcondition: the robot will have turned ~90° to the left
-turnLeft	movlw	0x40			;x40 times is close enough to 180° for me
+turnLeft	movlw	0x20			;x20 times is close enough to 90° for me
 			movwf	numTurns
 leftStart	movlw	b'00000110'
 			movwf	PORTA
@@ -219,6 +219,12 @@ isr
 				call	readIn
 				call	bitDelay
 				call	readIn
+				
+				btfsc	readIn, 0x01
+				goto	irFromRight
+				
+				call	turnRight
+	irFromRight	call	turnLeft
 
 ;################# BELOW IS AS OF YET UNUSED #################
 ;		squeal in pain
@@ -244,6 +250,7 @@ isr
 				goto	nowTurnLeft
 				
 ; turn left 180°
+				call	turnRight
 				call	turnRight
 				goto	endIsr
 				
