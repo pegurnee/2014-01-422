@@ -32,9 +32,9 @@ main
 	
 ;We must change memory banks to set the TRIS registers
 			bsf		STATUS,RP0
-			bsf		0x81, INTEDG		;rising edge interrupts
+			bcf		0x81, INTEDG	;falling edge interrupts
 			movlw	0x01
-			movwf	TRISB			;PORTB is output
+			movwf	TRISB			;PORTB is output, except for RB0 is input for interrupt
 			movlw	0xff
 			movwf	TRISA			;PORTA is input
 			bcf		STATUS,RP0		;return to bank 0
