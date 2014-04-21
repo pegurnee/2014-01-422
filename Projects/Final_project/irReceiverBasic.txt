@@ -1,0 +1,103 @@
+;irReceiverBasic.txt
+;connected to the IR Receiver, this chip will 
+;@author: Eddie Gurnee
+;@version: 4/21/14
+; uncomment following two lines if using 16f627 or 16f628.
+	LIST	p=16F628		;tell assembler what chip we are using
+	include "P16F628.inc"	;include the defaults for the chip
+	__config 0x3D18			;sets the configuration settings (oscillator type etc.)
+
+; We are telling the assembler we want to start allocating symbolic variables starting
+;    at machine location 0x20.
+
+cblock 	0x20 			;start of general purpose registers
+		var1			;var1 is symbolic name for location 0x20 - <use>
+		var2 			;var2 is symbolic name for location 0x21 - <use>
+	endc
+
+	org 0x00
+		goto	main
+		
+	org 0x04
+		goto	isr
+		
+main
+;the following lines turn off the comparators
+			movlw	0x07
+			movwf	CMCON		;turn comparators off (make it like a 16F84)
+	
+;enabled interrupts on B0
+			bsf		INTCON, GIE		;enable interrupts
+			bsf		INTCON, INTE	;B0 is the interrupt line
+	
+;We must change memory banks to set the TRIS registers
+			bsf		STATUS,RP0
+			bsf		0x81, INTEDG		;rising edge interrupts
+			movlw	0x01
+			movwf	TRISB			;PORTB is output
+			movlw	0xff
+			movwf	TRISA			;PORTA is input
+			bcf		STATUS,RP0		;return to bank 0
+
+;actual code for the program follows here
+
+; poll PORTA R5
+; when RA5 goes low
+	pollR5	btfsc	PORTA, 0x05
+			goto	pollR5
+			
+;	set PORTB R3 high 
+; 		(that does to an interrupt on the other receivers, making it wait for half a second)
+			bsf		PORTB, 0x03
+			bcf		PORTB, 0x03
+			
+;################# BELOW IS AS OF YET UNUSED #################
+; 	poll the three sent bits of data (each data is separated by 50 microseconds)
+; 		if low pulses == 0
+; 			do damage
+; 		if low pulses == 1
+;			send restart
+;		if low pulses == 2
+;			play music
+;################# ABOVE IS AS OF YET UNUSED #################
+
+; set PORTB R5 high (command line for driver)
+			bsf		PORTB, 0x05
+
+; set PORTB R4 high (interrupt pin on driver)
+			bsf		PORTB, 0x04
+			bcf		PORTB, 0x04
+
+;################# BELOW IS AS OF YET UNUSED #################	
+; 	pulse data (3 bits) to the main chip
+;		if first bit is low
+;			following bits contain location of the receiver (2 bits)
+;		if first bit is high
+;			if first bit is low
+;				send restart
+; 			if first bit is high
+;				the last bit decides the song
+;################# ABOVE IS AS OF YET UNUSED #################
+
+; set PORTB R5 low (command line for driver)
+			bcf		PORTB, 0x05
+			
+; return to polling
+			goto	pollR5
+
+;Subroutine: <name>
+;<subroutine summary>
+;Precondition: <requirements for the subroutine to execute correctly>
+;Postcondition: <results after correct subroutine execution>
+;<subroutine label>
+;			return
+
+;all of the interrupt data follows here
+isr
+			bcf		INTCON,INTF
+
+
+			retfie
+
+; don't forget the word 'end' (it ends the code)
+	end
