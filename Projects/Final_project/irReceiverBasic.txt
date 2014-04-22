@@ -71,8 +71,8 @@ main
 			bsf		PORTB, 0x04
 
 ; pulse data to the driver chip
-			call	goOutLow
-			call	goOutHigh
+			call	outGoLow
+			call	outGoHigh
 			
 ;################# BELOW IS AS OF YET UNUSED #################	
 ; 	pulse data (3 bits) to the main chip

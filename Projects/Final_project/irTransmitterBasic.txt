@@ -18,13 +18,10 @@ cblock 	0x20 			;start of general purpose registers
 	org 0x00
 		goto	main
 		
-	org 0x04
-		goto	isr
-		
 main
 ;the following lines turn off the comparators
 			movlw	0x07
-			movwf	CMCON		;turn comparators off (make it like a 16F84)
+			movwf	CMCON			;turn comparators off (make it like a 16F84)
 	
 ;We must change memory banks to set the TRIS registers
 			bsf		STATUS, RP0
@@ -63,7 +60,7 @@ main
 ;					if RA4 is low
 ;						wait 26 microseconds - stays high for tune 2
 ;################# ABOVE IS AS OF YET UNUSED #################
-			call	damage
+			call	damage 			;512 cycles
 			
 			goto	pollR5
 
@@ -84,17 +81,17 @@ irDelay_in	decfsz	d1, f
 ;Precondition: if RA2 is high
 ;Postcondition:
 ; cycle (go low for just damage)
-damage		call	cycle
+damage		call	cycle			;136
 ; wait 50 microseconds
-			call	irDelay
+			call	irDelay			;50 - 186
 			
 ; wait 26 microseconds - stays high for not restart
 ; wait 50 microseconds
-			call	cycleWait
-			call	irDelay
+			call	cycleWait		;136 - 322
+			call	irDelay			;50 - 372
 			
 ; wait 26 microseconds - stays high for not music
-			call	cycleWait
+			call	cycleWait		;136 - 508
 			
 			return					;4 cycles (including call)
 			
@@ -104,12 +101,14 @@ damage		call	cycle
 ;Postcondition: 
 cycle		movlw	0x05
 			movwf	pulseCount
-cycleCount	call	pulseDelay
-			bsf		PORTB, 0x07
-			call	pulseDelay
-			bcf		PORTB, 0x07
-			decfsz	pulseDelay, f
-			goto	cycleCount
+	cycleC	bsf		PORTB, 0x07		;1
+			call	pulseDelay		;8 - 9
+			goto	$+1				;2 - 11
+			goto	$+1				;2 - 13
+			bcf		PORTB, 0x07		;1 - 14
+			call	pulseDelay		;8 - 22
+			decfsz	pulseCount, f	;2 - 24
+			goto	cycleC			;2 - 26
 			
 			return					;4 cycles (including call)		
 
@@ -119,22 +118,22 @@ cycleCount	call	pulseDelay
 ;Postcondition: 
 cycleWait	movlw	0x05
 			movwf	pulseCount
-cycleWaitC	call	pulseDelay
-			nop
-			call	pulseDelay
-			nop
-			decfsz	pulseDelay, f
-			goto	cycleWaitC
+cycleWaitC	nop						;1
+			call	pulseDelay		;8 - 9
+			goto	$+1				;2 - 11
+			goto	$+1				;2 - 13
+			nop						;1 - 14
+			call	pulseDelay		;8 - 22
+			decfsz	pulseCount, f	;2 - 24
+			goto	cycleC			;2 - 26
 			
 			return					;4 cycles (including call)	
 			
 ;Subroutine: pulseDelay
-;delays for 12 microseconds
+;delays for 8 microseconds
 ;Precondition: 
-;Postcondition: 12 instruction cycles have passed
-pulseDelay	goto	$+1				;8 cycles
-			goto	$+1
-			goto	$+1
+;Postcondition: 8 instruction cycles have passed
+pulseDelay	goto	$+1				;4 cycles
 			goto	$+1
 			
 			return					;4 cycles (including call)
