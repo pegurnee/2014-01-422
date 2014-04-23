@@ -232,7 +232,8 @@ isr
 				goto	isr_wall
 			
 ;	if high, read two pulses
-	isr_ir		call	inBitDelay
+	isr_ir		call	bitDelay
+				call	inBitDelay
 				call	readIn
 				call	bitDelay
 				call	readIn
