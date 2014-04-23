@@ -1,0 +1,155 @@
+; irReceiveL.txt
+; connected to the IR Receiver, this chip 
+; 	will send the transmitter data onto the driver chip
+; @author: Eddie Gurnee
+; @version: 4/21/14
+; uncomment following two lines if using 16f627 or 16f628.
+	LIST	p=16F628		;tell assembler what chip we are using
+	include "P16F628.inc"	;include the defaults for the chip
+	__config 0x3D18			;sets the configuration settings (oscillator type etc.)
+
+; We are telling the assembler we want to start allocating symbolic variables starting
+;    at machine location 0x20.
+
+cblock 	0x20 			;start of general purpose registers
+		d1				;used for interrupt driven delay
+		d2				;used for interrupt driven delay
+	endc
+
+	org 0x00
+		goto	main
+		
+	org 0x04
+		goto	isr
+		
+main
+;the following lines turn off the comparators
+			movlw	0x07
+			movwf	CMCON		;turn comparators off (make it like a 16F84)
+	
+;enabled interrupts on B0
+			bsf		INTCON, GIE		;enable interrupts
+			bsf		INTCON, INTE	;B0 is the interrupt line
+	
+;We must change memory banks to set the TRIS registers
+			bsf		STATUS,RP0
+			bsf		0x81, INTEDG	;rising edge interrupts
+			movlw	0x01
+			movwf	TRISB			;PORTB is output, except for RB0 is input for interrupt
+			movlw	0xff
+			movwf	TRISA			;PORTA is input
+			bcf		STATUS,RP0		;return to bank 0
+
+;actual code for the program follows here
+			bsf		PORTB, 0x04
+			
+; poll PORTA R5
+; when RA5 goes low
+	pollR5	btfsc	PORTA, 5
+			goto	pollR5
+			
+;	set PORTB R3 high 
+; 		(that does to an interrupt on the other receivers, making it wait for a millisecond)
+			bsf		PORTB, 3
+			bcf		PORTB, 3
+			
+;################# BELOW IS AS OF YET UNUSED #################
+; 	poll the three sent bits of data (each data is 130 in length and separated by 50 microseconds, 90 cycle checks)
+; 		if low pulses == 0
+; 			do damage
+; 		if low pulses == 1
+;			send restart
+;		if low pulses == 2
+;			play music
+;################# ABOVE IS AS OF YET UNUSED #################
+
+; set PORTB R5 high (command line for driver)
+			bsf		PORTB, 5
+			call	bitDelay
+			
+; set PORTB R4 high (interrupt pin on driver)
+			bcf		PORTB, 4
+			bsf		PORTB, 4
+			call	bitDelay
+			
+; pulse data to the driver chip
+			call	outGoLow
+			call	outGoLow
+			
+;################# BELOW IS AS OF YET UNUSED #################	
+; 	pulse data (3 bits) to the main chip
+;		if first bit is low
+;			following bits contain location of the receiver (2 bits)
+;		if first bit is high
+;			if first bit is low
+;				send restart
+; 			if first bit is high
+;				the last bit decides the song
+;################# ABOVE IS AS OF YET UNUSED #################
+
+; set PORTB R5 low (command line for driver)
+			bcf		PORTB, 5
+			
+; return to polling
+			goto	pollR5
+
+;Subroutine: outGoLow
+;the amount to wait between each read in bit
+;Precondition: 
+;Postcondition: 50 microseconds have passed
+outGoLow	bcf		PORTB, 5
+			movlw	0x0F			;46 cycles
+			movwf	d1
+outLow_in	decfsz	d1, f
+			goto	outLow_in
+			
+			return					;4 cycles (including call)
+			
+;Subroutine: outGoHigh
+;the amount to wait between each read in bit
+;Precondition: 
+;Postcondition: 50 microseconds have passed
+outGoHigh	bsf		PORTB, 5
+			movlw	0x0F			;46 cycles
+			movwf	d1
+outHigh_in	decfsz	d1, f
+			goto	outHigh_in
+			
+			return					;4 cycles (including call)
+
+;Subroutine: bitDelay
+;the amount to wait between each read in bit
+;Precondition: 
+;Postcondition: 50 microseconds have passed
+bitDelay	movlw	0x0F			;46 cycles
+			movwf	d1
+bitDelay_in	decfsz	d1, f
+			goto	bitDelay_in
+			
+			return					;4 cycles (including call)
+				
+;all of the interrupt data follows here
+; on PORTB R0 interrupt
+isr
+; 	delay 500 milliseconds
+			movlw	0xC7
+			movwf	d1
+			movlw	0x01
+			movwf	d2
+		
+	wait	decfsz	d1, f
+			goto	$+2
+			decfsz	d2, f
+			goto	wait	; 2 cycles
+			
+			goto	$+1
+
+			
+; 	reset interrupt flag
+			bcf		INTCON, INTF
+			
+; 	goto polling RA5 (not return from interrupt)
+			goto	pollR5
+
+; don't forget the word 'end' (it ends the code)
+	end
