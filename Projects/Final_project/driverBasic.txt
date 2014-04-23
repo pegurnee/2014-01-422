@@ -49,7 +49,7 @@ main
 
 ;actual code follows here
 			clrf	didTurnRight
-restart		movlw	0x03
+restart		movlw	0x04
 			movwf	health
 			movlw	b'00001110'
 			movwf	PORTB
@@ -225,7 +225,7 @@ isr
 				bcf		PORTA, 2
 			
 ; 	check if PORTA R6 (input from IR receivers) is high
-				;btfsc	PORTA, 0x06
+				;btfsc	PORTA, 6
 				goto	isr_ir
 				goto	isr_wall
 			
@@ -248,17 +248,17 @@ isr
 ;		if health is at zero, power down
 				goto	beDead
 				
-	getDamaged	btfsc	PORTB, 0x03
+	getDamaged	btfsc	PORTB, 3
 				goto	hitOne
-				btfsc	PORTB, 0x02
+				btfsc	PORTB, 2
 				goto	hitTwo
 				goto	hitThree
 				
-	hitOne		bcf		PORTB, 3
+	hitOne		bcf		PORTB, 1
 				goto	endIsr
 	hitTwo		bcf		PORTB, 2
 				goto	endIsr
-	hitThree	bcf		PORTB, 1
+	hitThree	bcf		PORTB, 3
 				goto	endIsr
 
 ;################# BELOW IS AS OF YET UNUSED #################
