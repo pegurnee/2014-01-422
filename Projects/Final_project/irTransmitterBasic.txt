@@ -38,6 +38,18 @@ main
 	pollR5	btfss	PORTA, 0x05
 			goto	pollR5
 			
+	cheat	bsf		PORTB, 0x07		;1
+			call	pulseDelay		;8 - 9
+			goto	$+1				;2 - 11
+			goto	$+1				;2 - 13
+			bcf		PORTB, 0x07		;1 - 14
+			call	pulseDelay		;8 - 22
+			nop						;1 - 23
+			btfsc	PORTA, 0x05		;1 - 24
+			goto	cheat			;2 - 26
+			
+			goto	pollR5
+			
 ; call infiCycle
 			call 	infiCycle
 			
