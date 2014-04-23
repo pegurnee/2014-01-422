@@ -207,6 +207,17 @@ readIn		rlf		irData, f
 			addwf	irData, f
 
 			return
+			
+;Subroutine: beDead
+;Reads in the two three bits from the user
+;Precondition: 
+;Postcondition: 
+readIn		rlf		irData, f
+			movlw	0x01
+			btfsc	PORTA, 0x06
+			addwf	irData, f
+
+			return
 		
 ;all the interrupts
 isr
@@ -215,7 +226,7 @@ isr
 				bcf		PORTA, 2
 			
 ; 	check if PORTA R6 (input from IR receivers) is high
-				btfsc	PORTA, 0x06
+				;btfsc	PORTA, 0x06
 				goto	isr_ir
 				goto	isr_wall
 			
