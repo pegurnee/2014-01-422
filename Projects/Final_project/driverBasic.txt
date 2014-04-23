@@ -248,7 +248,7 @@ isr
 ;		if health is at zero, power down
 				goto	beDead
 				
-	getDamaged	btfsc	PORTB, 3
+	getDamaged	btfsc	PORTB, 1
 				goto	hitOne
 				btfsc	PORTB, 2
 				goto	hitTwo
