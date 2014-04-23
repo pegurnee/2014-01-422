@@ -19,6 +19,7 @@ cblock 	0x20 						;start of general purpose registers
 		backTime					;time limit to backup
 		numTurns					;used to track number of times rotated
 		irData						;used to get info about the ir receiver
+		health						;health of the robo dude
 	endc
 
 ;standard operation for using interrupts
@@ -48,6 +49,10 @@ main
 
 ;actual code follows here
 			clrf	didTurnRight
+restart		movlw	0x03
+			movwf	health
+			movlw	b'00001110'
+			movwf	PORTB
 			
 driveLoop	call	goForward
 			goto	driveLoop
@@ -225,7 +230,10 @@ isr
 				
 				call	turnRight
 	irFromRight	call	turnLeft
+				decfsz	health, f
 				goto	endIsr
+				
+				
 
 ;################# BELOW IS AS OF YET UNUSED #################
 ;		squeal in pain
