@@ -206,8 +206,8 @@ readIn		rlf		irData, f
 ;all the interrupts
 isr
 ; 	stop moving forward
-				movlw	b'00000000'
-				movwf	PORTA
+				bcf		PORTA, 1
+				bcf		PORTA, 2
 			
 ; 	check if PORTA R6 (input from IR receivers) is high
 				btfsc	PORTA, 0x06
@@ -225,6 +225,7 @@ isr
 				
 				call	turnRight
 	irFromRight	call	turnLeft
+				goto	endIsr
 
 ;################# BELOW IS AS OF YET UNUSED #################
 ;		squeal in pain
