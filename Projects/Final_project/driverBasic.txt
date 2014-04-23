@@ -203,21 +203,20 @@ inBit_in	decfsz	dReg1, f
 ;Postcondition: 
 readIn		rlf		irData, f
 			movlw	0x01
-			btfsc	PORTA, 0x06
+			btfsc	PORTA, 6
 			addwf	irData, f
 
 			return
 			
 ;Subroutine: beDead
-;Reads in the two three bits from the user
+;polls until he is no longer dead
 ;Precondition: 
 ;Postcondition: 
-readIn		rlf		irData, f
-			movlw	0x01
-			btfsc	PORTA, 0x06
-			addwf	irData, f
-
-			return
+beDead		bcf		PORTA, 1
+			bcf		PORTA, 2
+	isDead	btfsc	PORTA, 6
+			goto	restart
+			goto	isDead
 		
 ;all the interrupts
 isr
@@ -259,9 +258,6 @@ isr
 	hitTwo		bcf		PORTB, 2
 				goto	endIsr
 	hitThree	bcf		PORTB, 1
-				goto	endIsr
-				
-	beDead
 				goto	endIsr
 
 ;################# BELOW IS AS OF YET UNUSED #################
