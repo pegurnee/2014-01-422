@@ -49,13 +49,21 @@ main
 
 ;actual code follows here
 			clrf	didTurnRight
+			call	restart
+			
+driveLoop	call	goForward
+			goto	driveLoop
+			
+;Subroutine: restart
+;all the restart conditions
+;Precondition: 
+;Postcondition: 
 restart		movlw	0x04
 			movwf	health
 			movlw	b'00001110'
 			movwf	PORTB
 			
-driveLoop	call	goForward
-			goto	driveLoop
+			return
 
 ;Subroutine: goForward
 ;Moves the robot forward by setting the right servo to run clockwise, 
@@ -226,7 +234,7 @@ isr
 				call	bitDelay
 				call	readIn
 				
-				btfsc	readIn, 0x01
+				btfsc	readIn, 0
 				goto	irFromRight
 				
 				call	turnRight
@@ -256,7 +264,8 @@ isr
 				bcf		PORTA, 2
 	isDead		btfss	PORTA, 6
 				goto	isDead
-			
+				
+				call	restart			
 				goto	endIsr
 
 ;################# BELOW IS AS OF YET UNUSED #################
