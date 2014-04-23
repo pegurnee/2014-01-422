@@ -50,6 +50,7 @@ main
 ;actual code follows here
 			clrf	didTurnRight
 			call	restart
+			call	beDead
 			
 driveLoop	call	goForward
 			goto	driveLoop
@@ -215,6 +216,19 @@ readIn		rlf		irData, f
 			addwf	irData, f
 
 			return
+			
+;Subroutine: beDead
+;the routine to run while the robot is dead
+;Precondition: 
+;Postcondition: 
+beDead		bcf		PORTA, 1
+			bcf		PORTA, 2
+	isDead	btfss	PORTA, 6
+			goto	isDead
+				
+			call	restart
+
+			return
 		
 ;all the interrupts
 isr
@@ -245,7 +259,7 @@ isr
 	doingDamage	decfsz	health, f
 				goto	getDamaged
 ;		if health is at zero, power down
-				goto	beDead
+				goto	hitDone
 				
 	getDamaged	btfsc	PORTB, 1
 				goto	hitOne
@@ -260,12 +274,7 @@ isr
 	hitThree	bcf		PORTB, 3
 				goto	endIsr
 				
-	beDead		bcf		PORTA, 1
-				bcf		PORTA, 2
-	isDead		btfss	PORTA, 6
-				goto	isDead
-				
-				call	restart			
+	hitDone		call	beDead
 				goto	endIsr
 
 ;################# BELOW IS AS OF YET UNUSED #################
