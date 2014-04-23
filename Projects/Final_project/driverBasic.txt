@@ -207,7 +207,7 @@ readIn		rlf		irData, f
 			addwf	irData, f
 
 			return
-			
+
 ;Subroutine: beDead
 ;polls until he is no longer dead
 ;Precondition: 
