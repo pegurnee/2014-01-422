@@ -114,7 +114,18 @@ outHigh_in	decfsz	d1, f
 			goto	outHigh_in
 			
 			return					;4 cycles (including call)
+
+;Subroutine: bitDelay
+;the amount to wait between each read in bit
+;Precondition: 
+;Postcondition: 50 microseconds have passed
+bitDelay	movlw	0x0F			;46 cycles
+			movwf	d1
+bitDelay_in	decfsz	d1, f
+			goto	bitDelay_in
 			
+			return					;4 cycles (including call)
+				
 ;all of the interrupt data follows here
 ; on PORTB R0 interrupt
 isr
