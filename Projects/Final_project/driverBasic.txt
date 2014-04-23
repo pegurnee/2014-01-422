@@ -230,15 +230,31 @@ isr
 				
 				call	turnRight
 	irFromRight	call	turnLeft
+	
+; 		lower health
 				decfsz	health, f
+				goto	getDamaged
+;		if health is at zero, power down
+				goto	beDead
+				
+	getDamaged	btfsc	PORTB, 0x03
+				goto	hitOne
+				btfsc	PORTB, 0x02
+				goto	hitTwo
+				goto	hitThree
+				
+	hitOne		bcf		PORTB, 3
+				goto	endIsr
+	hitTwo		bcf		PORTB, 2
+				goto	endIsr
+	hitThree	bcf		PORTB, 1
 				goto	endIsr
 				
-				
+	beDead
+				goto	endIsr
 
 ;################# BELOW IS AS OF YET UNUSED #################
 ;		squeal in pain
-; 		lower health
-;		if health is at zero, power down
 ;		if high pulses == 0, the sender is on the right
 ;			turn left 90°
 ;		if high pulses == 1, the sender is on the left
