@@ -214,9 +214,11 @@ readIn		rlf		irData, f
 ;Postcondition: 
 beDead		bcf		PORTA, 1
 			bcf		PORTA, 2
-	isDead	btfsc	PORTA, 6
-			goto	restart
+	isDead	btfss	PORTA, 6
 			goto	isDead
+			
+			bcf		INTCON, INTF
+			goto	restart
 		
 ;all the interrupts
 isr
