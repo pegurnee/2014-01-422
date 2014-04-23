@@ -45,13 +45,13 @@ main
 			
 ; poll PORTA R5
 ; when RA5 goes low
-	pollR5	btfsc	PORTA, 0x05
+	pollR5	btfsc	PORTA, 5
 			goto	pollR5
 			
 ;	set PORTB R3 high 
 ; 		(that does to an interrupt on the other receivers, making it wait for a millisecond)
-			bsf		PORTB, 0x03
-			bcf		PORTB, 0x03
+			bsf		PORTB, 3
+			bcf		PORTB, 3
 			
 ;################# BELOW IS AS OF YET UNUSED #################
 ; 	poll the three sent bits of data (each data is 130 in length and separated by 50 microseconds, 90 cycle checks)
@@ -64,12 +64,14 @@ main
 ;################# ABOVE IS AS OF YET UNUSED #################
 
 ; set PORTB R5 high (command line for driver)
-			bsf		PORTB, 0x05
+			bsf		PORTB, 5
+			call	bitDelay
 			
 ; set PORTB R4 high (interrupt pin on driver)
-			bcf		PORTB, 0x04
-			bsf		PORTB, 0x04
-
+			bcf		PORTB, 4
+			bsf		PORTB, 4
+			call	bitDelay
+			
 ; pulse data to the driver chip
 			call	outGoLow
 			call	outGoHigh
@@ -86,7 +88,7 @@ main
 ;################# ABOVE IS AS OF YET UNUSED #################
 
 ; set PORTB R5 low (command line for driver)
-			bcf		PORTB, 0x05
+			bcf		PORTB, 5
 			
 ; return to polling
 			goto	pollR5
@@ -95,7 +97,7 @@ main
 ;the amount to wait between each read in bit
 ;Precondition: 
 ;Postcondition: 50 microseconds have passed
-outGoLow	bcf		PORTB, 0x05
+outGoLow	bcf		PORTB, 5
 			movlw	0x0F			;46 cycles
 			movwf	d1
 outLow_in	decfsz	d1, f
@@ -107,7 +109,7 @@ outLow_in	decfsz	d1, f
 ;the amount to wait between each read in bit
 ;Precondition: 
 ;Postcondition: 50 microseconds have passed
-outGoHigh	bsf		PORTB, 0x05
+outGoHigh	bsf		PORTB, 5
 			movlw	0x0F			;46 cycles
 			movwf	d1
 outHigh_in	decfsz	d1, f
