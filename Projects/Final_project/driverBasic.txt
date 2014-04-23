@@ -207,18 +207,6 @@ readIn		rlf		irData, f
 			addwf	irData, f
 
 			return
-
-;Subroutine: beDead
-;polls until he is no longer dead
-;Precondition: 
-;Postcondition: 
-beDead		bcf		PORTA, 1
-			bcf		PORTA, 2
-	isDead	btfss	PORTA, 6
-			goto	isDead
-			
-			bcf		INTCON, INTF
-			goto	restart
 		
 ;all the interrupts
 isr
@@ -227,7 +215,7 @@ isr
 				bcf		PORTA, 2
 			
 ; 	check if PORTA R6 (input from IR receivers) is high
-				;btfsc	PORTA, 6
+				btfsc	PORTA, 6
 				goto	isr_ir
 				goto	isr_wall
 			
@@ -262,6 +250,13 @@ isr
 	hitTwo		bcf		PORTB, 2
 				goto	endIsr
 	hitThree	bcf		PORTB, 3
+				goto	endIsr
+				
+	beDead		bcf		PORTA, 1
+				bcf		PORTA, 2
+	isDead		btfss	PORTA, 6
+				goto	isDead
+			
 				goto	endIsr
 
 ;################# BELOW IS AS OF YET UNUSED #################
