@@ -95,6 +95,21 @@ damage		call	cycle			;136
 			
 			return					;4 cycles (including call)
 			
+;Subroutine: infiCycle
+;cycle the IR 5 times at 9600 baud
+;Precondition: 
+;Postcondition: 
+infiCycle	bsf		PORTB, 0x07		;1
+			call	pulseDelay		;8 - 9
+			goto	$+1				;2 - 11
+			goto	$+1				;2 - 13
+			bcf		PORTB, 0x07		;1 - 14
+			call	pulseDelay		;8 - 22
+			goto	$+1				;2 - 24
+			goto	infiCycle		;2 - 26
+			
+			return					;4 cycles (including call)	
+
 ;Subroutine: cycle
 ;cycle the IR 5 times at 9600 baud
 ;Precondition: 
