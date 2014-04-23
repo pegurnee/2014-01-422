@@ -38,6 +38,9 @@ main
 	pollR5	btfss	PORTA, 0x05
 			goto	pollR5
 			
+; call infiCycle
+			call 	infiCycle
+			
 ;	cycle (inital go low)
 			call	cycle
 ;	wait 50 microseconds
