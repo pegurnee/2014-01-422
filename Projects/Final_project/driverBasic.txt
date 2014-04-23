@@ -239,10 +239,11 @@ isr
 				goto	irFromRight
 				
 				call	turnRight
+				goto	doingDamage
 	irFromRight	call	turnLeft
 	
 ; 		lower health
-				decfsz	health, f
+	doingDamage	decfsz	health, f
 				goto	getDamaged
 ;		if health is at zero, power down
 				goto	beDead
